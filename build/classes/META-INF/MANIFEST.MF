@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Created-By: 10.0-b22 (Sun Microsystems Inc.)
+Main-Class: org.hackystat.sensorbase.server.Server
+Implementation-Title: Hackystat SensorBase-UH
+Implementation-Version: 8.x.617
+Implementation-Vendor: Collaborative Software Development Laboratory, 
+ University of Hawaii
+
