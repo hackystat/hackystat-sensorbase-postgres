@@ -49,7 +49,7 @@
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
-        <fileset file="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
+        <fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
 
@@ -64,10 +64,9 @@
         <html outfile="${emma.dir}/coverage.html" depth="method" columns="name,class,method,block,line" />
       </report>
     </emma>
-    <!-- Now delete the instrumented .class files, and re-jar them
+    <!-- Now delete the instrumented .class files, and re-jar them -->
     <delete dir="${build.dir}/classes" />
     <ant antfile="jar.build.xml"/> 
-  	-->
   </target>
 
   <target name="emma.report" unless="emma.disabled" description="Generates XML and HTML reports.">

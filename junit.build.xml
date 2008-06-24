@@ -28,9 +28,13 @@
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
-      	<fileset file="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
+      	<fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
+  	
+    <!-- Now delete the  unecessary .class files , and re-jar them -->
+    <delete dir="${build.dir}/classes" />
+    <ant antfile="jar.build.xml"/>
   </target>
 
   <target name="junit.report" description="Generates an HTML report for JUnit.">
