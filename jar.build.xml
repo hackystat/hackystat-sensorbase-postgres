@@ -11,6 +11,9 @@
 
   <target name="jar-standalone" depends="compile" 
     description="Create sensorbase-postgres.jar">
+	<!-- Extract the sensorbase.jar class files. -->
+  	<unzip src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${build.dir}/classes"/>
+  	
     <!-- Define the directories and distribution name -->
     <delete dir="${tmp.dir}" quiet="yes"/>
     <mkdir dir="${tmp.dir}" />

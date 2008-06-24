@@ -33,6 +33,7 @@ import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordatatypes.jaxb.SensorDataType;
 import org.hackystat.sensorbase.resource.users.jaxb.User;
+import org.hackystat.sensorbase.server.PostgresServerProperties;
 import org.hackystat.sensorbase.server.Server;
 import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
@@ -44,8 +45,7 @@ import org.hackystat.utilities.tstamp.Tstamp;
  * @author Austen Ito
  */
 public class PostgresImplementation extends DbImplementation {
-  private static final String connectionURL = "jdbc:postgresql:hackystat_dev?"
-      + "user=root&password=";
+  private final String connectionURL;
   /** Indicates whether this database was initialized or was pre-existing. */
   private boolean isFreshlyCreated;
 
@@ -81,6 +81,10 @@ public class PostgresImplementation extends DbImplementation {
    */
   public PostgresImplementation(Server server) {
     super(server);
+    PostgresServerProperties props = new PostgresServerProperties();
+    this.connectionURL = "jdbc:postgresql:hackystat_dev?" + "user="
+        + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
+        + props.get(PostgresServerProperties.POSTGRES_PASSWORD);
   }
 
   /** {@inheritDoc} */
@@ -909,7 +913,7 @@ public class PostgresImplementation extends DbImplementation {
     PreparedStatement dataStatement = null;
     ResultSet countResultSet = null;
     try {
-      conn = DriverManager.getConnection(PostgresImplementation.connectionURL);
+      conn = DriverManager.getConnection(this.connectionURL);
       String countQuery = "SELECT * FROM SensorDataType where name='" + sdt.getName() + "'";
       countStatement = conn.prepareStatement(countQuery, ResultSet.TYPE_SCROLL_SENSITIVE,
           ResultSet.CONCUR_READ_ONLY);

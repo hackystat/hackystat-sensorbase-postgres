@@ -32,9 +32,9 @@
       </batchtest>
     </junit>
   	
-    <!-- Now delete the  unecessary .class files , and re-jar them -->
+    <!-- Now delete the  unecessary .class files-->
     <delete dir="${build.dir}/classes" />
-    <ant antfile="jar.build.xml"/>
+  	<antcall target="compile" />
   </target>
 
   <target name="junit.report" description="Generates an HTML report for JUnit.">
