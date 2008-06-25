@@ -12,6 +12,8 @@ import java.util.Properties;
  * @author Austen Ito
  */
 public class PostgresServerProperties {
+  /** The postgres database name. */
+  public static final String POSTGRES_DB = "postgres.db";
   /** The postgres server username. */
   public static final String POSTGRES_USER = "postgres.user";
   /** The postgres server password. */
@@ -45,6 +47,7 @@ public class PostgresServerProperties {
     // Set defaults for 'standard' operation.
     properties.setProperty(POSTGRES_USER, "");
     properties.setProperty(POSTGRES_PASSWORD, "");
+    properties.setProperty(POSTGRES_DB, "");
 
     FileInputStream stream = null;
     try {

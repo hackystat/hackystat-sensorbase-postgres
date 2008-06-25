@@ -82,8 +82,8 @@ public class PostgresImplementation extends DbImplementation {
   public PostgresImplementation(Server server) {
     super(server);
     PostgresServerProperties props = new PostgresServerProperties();
-    this.connectionURL = "jdbc:postgresql:hackystat_dev?" + "user="
-        + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
+    this.connectionURL = "jdbc:postgresql:" + props.get(PostgresServerProperties.POSTGRES_DB)
+        + "?user=" + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
         + props.get(PostgresServerProperties.POSTGRES_PASSWORD);
   }
 
@@ -1187,7 +1187,7 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in getProjectSummary()" + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in getProjectSummary()" + StackTrace.toString(e));
     }
     finally {
       try {
