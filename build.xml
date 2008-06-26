@@ -28,14 +28,10 @@
   <available file="${junit.jar}" type="file" property="junit.available" />
   <fail message="This package requires JUNIT_HOME to be defined and ${junit.jar} available" unless="junit.available" />
 
-  <!-- Make sure that Sensorbase is installed . -->
-  <available file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" type="file" property="sensorbase.available" />
-  <fail message="This package requires the HACKYSTAT_SENSORBASE_HOME to be defined" unless="sensorbase.available" />
-
-  <!-- Make sure that the JAXB library is available (by default in Java 6, through manual installation in Java 5. -->
-  <available classname="javax.xml.bind.JAXBContext" property="jaxb.available" />
-  <fail message="This package requires JAXB to be installed" unless="jaxb.available" />
-
+  <!-- Make sure that JavaMail is installed . -->
+  <available file="${env.JAVAMAIL_HOME}/mail.jar" type="file" property="javamail.available" />
+  <fail message="This package requires JavaMail 1.4 to be downloaded and JAVAMAIL_HOME defined" unless="javamail.available" />
+	
   <!-- Make sure that Postgres JDBC driver is available . -->
   <available file="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" type="file" property="postgres.driver.available"/>
   <fail message="This package requires the Postgres JDBC Connector to be installed and env.POSTGRES_DRIVER_HOME defined" unless="postgres.driver.available"/>
@@ -65,7 +61,8 @@
 
   <!-- The compile classpath is useful to many tools. -->
   <path id="compile.classpath">
-  	<fileset file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" />
+  	<fileset file="${basedir}/sensorbase.jar" />
+  	<fileset file="${env.JAVAMAIL_HOME}/mail.jar" />
     <fileset file="${env.FINDBUGS_HOME}/lib/annotations.jar" />
   	<fileset file="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" />
   </path>
@@ -81,8 +78,22 @@
   </target>
 
   <target name="clean" description="Delete build/ directory and top-level sensorbase jar files.">
+  	<!-- Removes the sensorbase-postgres.jar from the sensorbase.jar's classpath.  
+  	This is done so a compile warning looking for the jar does not fail the build. -->
+  	<mkdir dir="${tmp.sensorbase.dir}" />
+  	<unzip src="${basedir}/sensorbase.jar" dest="${tmp.sensorbase.dir}" />
+  	<jar destfile="${basedir}/sensorbase.jar" basedir="${tmp.sensorbase.dir}">
+  	  <manifest>
+  	    <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
+  	    <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
+  	    <attribute name="Implementation-Version" value="${version}"/>
+  	    <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>        
+  	  </manifest>
+    </jar>
+  	<delete dir="${tmp.sensorbase.dir}" />
+  	
     <delete>
-      <fileset dir="${basedir}" includes="sensorbase*.jar" />
+      <fileset dir="${basedir}" includes="sensorbase-postgres.jar" />
     </delete>
     <delete dir="${build.dir}" />
   </target>

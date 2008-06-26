@@ -14,7 +14,7 @@
     <mkdir dir="${junit.dir}" />
 
   	<!-- Extracts the sensorbase.jar file for unit testing. -->
-  	<unzip src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${build.dir}/classes" />
+  	<unzip src="${basedir}/sensorbase.jar" dest="${build.dir}/classes" />
   	
     <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
     <!-- Fork is on until I can figure out how to stop the sensorbase and unbind the port. -->

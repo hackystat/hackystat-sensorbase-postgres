@@ -16,7 +16,7 @@
     <fail unless="emma.available" message="Error: EMMA_HOME not set or ${env.EMMA_HOME}/lib/emma.jar not found, indicating Emma is not installed." />
 
   	<!-- Extract the sensorbase.jar class files. -->
-  	<unzip src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${build.dir}/classes"/>
+  	<unzip src="${basedir}/sensorbase.jar" dest="${build.dir}/classes"/>
   	
     <!-- Define the path and taskdef containing the emma binaries. -->
     <property name="emma.lib.dir" value="${env.EMMA_HOME}/lib" />

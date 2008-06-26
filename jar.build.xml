@@ -6,13 +6,24 @@
   <import file="build.xml"/>
   <property name="tmp.dir" location="${basedir}/tmp" />
   <property name="tmp.lib.dir" location="${basedir}/tmp-lib" />
- 
+  <property name="tmp.sensorbase.dir" location="${basedir}/tmp-sensorbase" />
+
   <target name="jar" depends="jar-standalone"/>   
 
   <target name="jar-standalone" depends="compile" 
     description="Create sensorbase-postgres.jar">
-	<!-- Extract the sensorbase.jar class files, which contains everything the sensorbase-postgres.jar file requires. -->
-  	<unzip src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${build.dir}/classes"/>
+  	<!-- Adds the sensorbase-postgres.jar to the sensorbase.jar's classpath -->
+  	<mkdir dir="${tmp.sensorbase.dir}" />
+  	<unzip src="${basedir}/sensorbase.jar" dest="${tmp.sensorbase.dir}" />
+  	<jar destfile="${basedir}/sensorbase.jar" basedir="${tmp.sensorbase.dir}">
+  	  <manifest>
+  	    <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
+  	    <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
+  	    <attribute name="Implementation-Version" value="${version}"/>
+  	    <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
+        <attribute name="Class-Path" value="sensorbase-postgres.jar" /> 
+  	  </manifest>
+    </jar>
   	
     <!-- Define the directories and distribution name -->
     <delete dir="${tmp.dir}" quiet="yes"/>
@@ -33,6 +44,7 @@
      </jar>
 
     <delete dir="${tmp.dir}" />
+  	<delete dir="${tmp.sensorbase.dir}" />
   </target> 
 </project>
 
