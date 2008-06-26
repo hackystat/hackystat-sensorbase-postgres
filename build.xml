@@ -31,29 +31,12 @@
   <!-- Make sure that Sensorbase is installed . -->
   <available file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" type="file" property="sensorbase.available" />
   <fail message="This package requires the HACKYSTAT_SENSORBASE_HOME to be defined" unless="sensorbase.available" />
-	
-  <!-- Make sure that Restlet is installed . -->
-  <available file="${env.RESTLET_HOME}/lib/org.restlet.jar" type="file" property="restlet.available" />
-  <fail message="This package requires the Restlet Framework to be downloaded and RESTLET_HOME defined" unless="restlet.available" />
-
-  <!-- Make sure that JavaMail is installed . -->
-  <available file="${env.JAVAMAIL_HOME}/mail.jar" type="file" property="javamail.available" />
-  <fail message="This package requires JavaMail 1.4 to be downloaded and JAVAMAIL_HOME defined" unless="javamail.available" />
 
   <!-- Make sure that the JAXB library is available (by default in Java 6, through manual installation in Java 5. -->
   <available classname="javax.xml.bind.JAXBContext" property="jaxb.available" />
   <fail message="This package requires JAXB to be installed" unless="jaxb.available" />
 
-  <!-- Make sure that Derby is available . -->
-  <!-- Needed even under Java 6 so that a Java 5-compatible dist can be created. -->
-  <available file="${env.DERBY_HOME}/lib/derby.jar" type="file" property="derby.available" />
-  <fail message="This package requires Derby to be installed and DERBY_HOME defined" unless="derby.available" />
-
-  <!-- Make sure that Hackystat Utilities are is available . -->
-  <available file="${env.HACKYSTAT_UTILITIES_HOME}/stacktrace.lib.jar" type="file" property="hackystat.utilities.available" />
-  <fail message="This package requires the Hackystat Utilities to be installed and HACKYSTAT_UTILITIES_HOME defined" unless="hackystat.utilities.available" />
-
-  <!-- Make sure that Hackystat Utilities are is available . -->
+  <!-- Make sure that Postgres JDBC driver is available . -->
   <available file="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" type="file" property="postgres.driver.available"/>
   <fail message="This package requires the Postgres JDBC Connector to be installed and env.POSTGRES_DRIVER_HOME defined" unless="postgres.driver.available"/>
 	                     
@@ -83,20 +66,6 @@
   <!-- The compile classpath is useful to many tools. -->
   <path id="compile.classpath">
   	<fileset file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/hackystatlogger.lib.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/stacktrace.lib.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/tstamp.lib.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/uricache.lib.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/time.lib.jar" />
-    <fileset file="${env.HACKYSTAT_UTILITIES_HOME}/hackystatuserhome.lib.jar" />
-    <fileset file="${env.JUNIT_HOME}/junit-${junit.version}.jar" />
-    <fileset file="${env.RESTLET_HOME}/lib/org.restlet.jar" />
-    <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.jar" />
-    <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.ext.net.jar" />
-    <fileset file="${env.RESTLET_HOME}/lib/com.noelios.restlet.ext.simple_3.1.jar" />
-    <fileset file="${env.RESTLET_HOME}/lib/org.simpleframework_3.1/org.simpleframework.jar" />
-    <fileset file="${env.JAVAMAIL_HOME}/mail.jar" />
-    <fileset file="${env.DERBY_HOME}/lib/derby.jar" />
     <fileset file="${env.FINDBUGS_HOME}/lib/annotations.jar" />
   	<fileset file="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" />
   </path>
