@@ -37,7 +37,7 @@
   <fail message="This package requires the Postgres JDBC Connector to be installed and env.POSTGRES_DRIVER_HOME defined" unless="postgres.driver.available"/>
 	                     
   <!-- Basic properties for this system. -->
-  <property name="system.name" value="hackystat-sensorbase-uh" />
+  <property name="system.name" value="hackystat-sensorbase-postgres" />
   <property name="majorVersionNumber" value="8" />
   <property name="minorVersionNumber" value="x" />
   <tstamp>
