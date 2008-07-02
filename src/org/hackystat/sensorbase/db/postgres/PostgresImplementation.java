@@ -35,6 +35,7 @@ import org.hackystat.sensorbase.resource.sensordatatypes.jaxb.SensorDataType;
 import org.hackystat.sensorbase.resource.users.jaxb.User;
 import org.hackystat.sensorbase.server.PostgresServerProperties;
 import org.hackystat.sensorbase.server.Server;
+import org.hackystat.sensorbase.uripattern.UriPattern;
 import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
 
@@ -299,6 +300,22 @@ public class PostgresImplementation extends DbImplementation {
     String query = "SELECT * FROM SensorDataType where Name='" + sdtName + "'";
     PreparedStatement statement = conn.prepareStatement(query,
         ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    return statement.executeQuery();
+  }
+
+  private ResultSet getProjectRecord(Connection conn, String projectName) throws SQLException {
+    String query = "SELECT * FROM Project where ProjectName='" + projectName + "'";
+    PreparedStatement statement = conn.prepareStatement(query,
+        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    return statement.executeQuery();
+  }
+
+  private ResultSet getProjectUriRecords(Connection conn, String projectName)
+      throws SQLException {
+    String query = "SELECT * FROM ProjectUri where Project_Id IN "
+        + "(SELECT Id FROM Project WHERE ProjectName='Default')";
+    PreparedStatement statement = conn.prepareStatement(query,
+        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
     return statement.executeQuery();
   }
 
@@ -1066,9 +1083,20 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public void deleteProject(User owner, String projectName) {
     Connection conn = null;
+    ResultSet projectUriResults = null;
     ResultSet userResults = null;
     try {
       conn = DriverManager.getConnection(connectionURL);
+
+      // Removes the ProjectUri records associated with the project.
+      projectUriResults = this.getProjectUriRecords(conn, projectName);
+      if (projectUriResults.next()) {
+        String statement = "DELETE FROM ProjectUri WHERE Id='"
+            + projectUriResults.getObject("Id") + "'";
+        deleteResource(statement);
+      }
+
+      // Removes the Project.
       userResults = this.getUserRecord(conn, owner.getEmail());
       if (userResults.next()) {
         String statement = "DELETE FROM Project WHERE " + ownerIdEquals
@@ -1083,6 +1111,7 @@ public class PostgresImplementation extends DbImplementation {
     finally {
       try {
         conn.close();
+        projectUriResults.close();
         userResults.close();
       }
       catch (SQLException e) {
@@ -1249,10 +1278,13 @@ public class PostgresImplementation extends DbImplementation {
     Connection conn = null;
     PreparedStatement countStatement = null;
     PreparedStatement projectStatement = null;
+    PreparedStatement projectUriStatement = null;
     ResultSet countResultSet = null;
     ResultSet userResultSet = null;
+    ResultSet projectUriResultSet = null;
+    ResultSet projectResultSet = null;
     try {
-      // Get the amount of projects with the specfied name.
+      // Get the amount of projects with the specified name.
       conn = DriverManager.getConnection(connectionURL);
       String countQuery = "SELECT * FROM Project where ProjectName='" + project.getName()
           + "'";
@@ -1267,6 +1299,28 @@ public class PostgresImplementation extends DbImplementation {
 
         // If a project with the same name exists, let's update the record.
         if (countResultSet.next()) {
+          // First, delete the ProjectUri Records linked to the updated Project.
+          projectUriResultSet = this.getProjectUriRecords(conn, project.getName());
+          while (projectUriResultSet.next()) {
+            String statement = "DELETE FROM ProjectUri WHERE Id='"
+                + projectUriResultSet.getObject("Id") + "'";
+            deleteResource(statement);
+          }
+
+          // Then add the new uri record. A remove and add action is done
+          // because there is not way to figure out which project uri to update.
+          projectResultSet = this.getProjectRecord(conn, project.getName());
+          projectResultSet.next();
+          for (String pattern : project.getUriPatterns().getUriPattern()) {
+            projectUriStatement = conn
+                .prepareStatement("INSERT INTO ProjectUri VALUES (?, ?, ?)");
+            // Order: Id Project_Id Uri
+            projectUriStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
+            projectUriStatement.setObject(2, projectResultSet.getObject("Id"), Types.OTHER);
+            projectUriStatement.setString(3, pattern);
+            projectUriStatement.executeUpdate();
+          }
+
           projectStatement = conn.prepareStatement("UPDATE Project SET "
               + " StartTime=?, EndTime=?, LastMod=?, XmlProject=?, XmlProjectRef=?"
               + " WHERE Owner_Id=?" + andClause + "ProjectName=?");
@@ -1286,7 +1340,8 @@ public class PostgresImplementation extends DbImplementation {
               .prepareStatement("INSERT INTO Project VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
           // Order: Id ProjectName Owner_Id StartTime EndTime LastMod XmlProject
           // XmlProjectRef
-          projectStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
+          UUID projectId = UUID.randomUUID();
+          projectStatement.setObject(1, projectId, Types.OTHER);
           projectStatement.setString(2, project.getName());
           projectStatement.setObject(3, ownerId, Types.OTHER);
           projectStatement.setTimestamp(4, Tstamp.makeTimestamp(project.getStartTime()));
@@ -1295,6 +1350,16 @@ public class PostgresImplementation extends DbImplementation {
           projectStatement.setString(7, xmlProject);
           projectStatement.setString(8, xmlProjectRef);
           projectStatement.executeUpdate();
+
+          for (String pattern : project.getUriPatterns().getUriPattern()) {
+            projectUriStatement = conn
+                .prepareStatement("INSERT INTO ProjectUri VALUES (?, ?, ?)");
+            // Order: Id Project_Id Uri
+            projectUriStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
+            projectUriStatement.setObject(2, projectId, Types.OTHER);
+            projectUriStatement.setString(3, pattern);
+            projectUriStatement.executeUpdate();
+          }
           this.logger.fine("Postgres: Inserted " + project.getOwner() + " "
               + project.getName());
         }
@@ -1307,6 +1372,12 @@ public class PostgresImplementation extends DbImplementation {
       try {
         if (projectStatement != null) {
           projectStatement.close();
+        }
+        if (projectUriStatement != null) {
+          projectUriStatement.close();
+        }
+        if (projectResultSet != null) {
+          projectResultSet.close();
         }
         countStatement.close();
         countResultSet.close();
@@ -1358,7 +1429,6 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     builder.append("</").append(resourceName).append(indexSuffix);
-    // System.out.println(builder.toString());
     return builder.toString();
   }
 
@@ -1422,7 +1492,6 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     builder.append("</").append(resourceName).append(indexSuffix);
-    // System.out.println(builder.toString());
     return builder.toString();
   }
 
@@ -1475,7 +1544,6 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     builder.append("</").append(resourceName).append(indexSuffix);
-    // System.out.println(builder.toString());
     return builder.toString();
   }
 
@@ -1527,7 +1595,7 @@ public class PostgresImplementation extends DbImplementation {
     PreparedStatement s = null;
     try {
       conn = DriverManager.getConnection(connectionURL);
-      server.getLogger().fine("Derby: " + statement);
+      server.getLogger().fine("Postgres: " + statement);
       s = conn.prepareStatement(statement);
       s.executeUpdate();
     }
@@ -1540,6 +1608,7 @@ public class PostgresImplementation extends DbImplementation {
         conn.close();
       }
       catch (SQLException e) {
+        e.printStackTrace();
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
       }
     }
@@ -1614,7 +1683,6 @@ public class PostgresImplementation extends DbImplementation {
             + " (Tstamp BETWEEN TIMESTAMP '" + Tstamp.makeTimestamp(startTime) + "' AND " // NOPMD
             + " TIMESTAMP '" + Tstamp.makeTimestamp(endTime) + "')" // NOPMD
             + constructLikeClauses(uriPatterns) + orderByTstamp;
-        System.out.println(statement);
         return getIndex("SensorData", statement);
       }
     }
