@@ -118,6 +118,22 @@
       </Property>
     </Properties>
   </SensorDataType>
+  
+  <SensorDataType Name="DevEvent">
+    <Description>SDT used for developer level events.</Description>
+    <RequiredFields>
+      <RequiredField>
+        <Name>SampleField</Name>
+        <Description>Sample Field Value</Description>
+      </RequiredField>
+    </RequiredFields>
+    <Properties>
+      <Property>
+        <Key>SampleProperty</Key>
+        <Value>Sample Property Value</Value>
+      </Property>
+    </Properties>
+  </SensorDataType>  
 </SensorDataTypes>
 
 
