@@ -35,7 +35,6 @@ import org.hackystat.sensorbase.resource.sensordatatypes.jaxb.SensorDataType;
 import org.hackystat.sensorbase.resource.users.jaxb.User;
 import org.hackystat.sensorbase.server.PostgresServerProperties;
 import org.hackystat.sensorbase.server.Server;
-import org.hackystat.sensorbase.uripattern.UriPattern;
 import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
 
@@ -303,6 +302,15 @@ public class PostgresImplementation extends DbImplementation {
     return statement.executeQuery();
   }
 
+  /**
+   * The helper method used to return a Project ResultSet with the specified
+   * project name.
+   * @param conn the connection used to obtain the record.
+   * @param projectName the name of project.
+   * @return the result set containing the record with the specified project
+   * name.
+   * @throws SQLException thrown if the record could not be returned.
+   */
   private ResultSet getProjectRecord(Connection conn, String projectName) throws SQLException {
     String query = "SELECT * FROM Project where ProjectName='" + projectName + "'";
     PreparedStatement statement = conn.prepareStatement(query,
@@ -310,10 +318,18 @@ public class PostgresImplementation extends DbImplementation {
     return statement.executeQuery();
   }
 
+  /**
+   * The helper method used to return a ProjectUri ResultSet with the related to
+   * the project with the specified project name.
+   * @param conn the connection used to obtain the record.
+   * @param projectName the name of project.
+   * @return the result set containing the record with the specified project uri.
+   * @throws SQLException thrown if the record could not be returned.
+   */
   private ResultSet getProjectUriRecords(Connection conn, String projectName)
       throws SQLException {
     String query = "SELECT * FROM ProjectUri where Project_Id IN "
-        + "(SELECT Id FROM Project WHERE ProjectName='Default')";
+        + "(SELECT Id FROM Project WHERE ProjectName='" + projectName + "')";
     PreparedStatement statement = conn.prepareStatement(query,
         ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
     return statement.executeQuery();
@@ -1308,7 +1324,7 @@ public class PostgresImplementation extends DbImplementation {
           }
 
           // Then add the new uri record. A remove and add action is done
-          // because there is not way to figure out which project uri to update.
+          // because there is no way to figure out which project uri to update.
           projectResultSet = this.getProjectRecord(conn, project.getName());
           projectResultSet.next();
           for (String pattern : project.getUriPatterns().getUriPattern()) {
