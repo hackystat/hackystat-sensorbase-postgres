@@ -1,6 +1,6 @@
 package org.hackystat.sensorbase.db.postgres;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,17 +19,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.hackystat.sensorbase.db.DbImplementation;
 import org.hackystat.sensorbase.resource.projects.jaxb.Project;
 import org.hackystat.sensorbase.resource.projects.jaxb.ProjectSummary;
 import org.hackystat.sensorbase.resource.projects.jaxb.SensorDataSummaries;
 import org.hackystat.sensorbase.resource.projects.jaxb.SensorDataSummary;
-import org.hackystat.sensorbase.resource.sensordata.jaxb.Property;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordatatypes.jaxb.SensorDataType;
 import org.hackystat.sensorbase.resource.users.jaxb.User;
@@ -45,7 +43,10 @@ import org.hackystat.utilities.tstamp.Tstamp;
  * @author Austen Ito
  */
 public class PostgresImplementation extends DbImplementation {
+  /** The database connection url. */
   private final String connectionURL;
+  /** The database connection. */
+  private Connection connection = null;
   /** Indicates whether this database was initialized or was pre-existing. */
   private boolean isFreshlyCreated;
 
@@ -85,6 +86,12 @@ public class PostgresImplementation extends DbImplementation {
     this.connectionURL = "jdbc:postgresql:" + props.get(PostgresServerProperties.POSTGRES_DB)
         + "?user=" + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
         + props.get(PostgresServerProperties.POSTGRES_PASSWORD);
+    try {
+      this.connection = DriverManager.getConnection(this.connectionURL);
+    }
+    catch (SQLException e) {
+      this.logger.warning("Postgres: failed to open connection." + StackTrace.toString(e));
+    }
   }
 
   /** {@inheritDoc} */
@@ -96,7 +103,6 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public boolean storeSensorData(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet userResultSet = null;
     ResultSet sdtResultSet = null;
@@ -104,9 +110,8 @@ public class PostgresImplementation extends DbImplementation {
 
     try {
       // Get the user and sdt associated with the data.
-      conn = DriverManager.getConnection(connectionURL);
-      userResultSet = this.getUserRecord(conn, data.getOwner());
-      sdtResultSet = this.getSdtRecord(conn, data.getSensorDataType());
+      userResultSet = this.getUserRecord(this.connection, data.getOwner());
+      sdtResultSet = this.getSdtRecord(this.connection, data.getSensorDataType());
 
       // Only store data if the sdt and user exists.
       boolean hasSdt = sdtResultSet.next();
@@ -116,11 +121,12 @@ public class PostgresImplementation extends DbImplementation {
         Object sdtId = sdtResultSet.getObject("Id");
 
         // Get the amount of records with the owner and timestamp.
-        dataResultSet = this.getSensorDataRecord(conn, ownerId, data.getTimestamp());
+        dataResultSet = this
+            .getSensorDataRecord(this.connection, ownerId, data.getTimestamp());
 
         // If the user with the same timestamp exists, perform an update.
         if (dataResultSet.next()) {
-          s = conn.prepareStatement("UPDATE SensorData SET "
+          s = this.connection.prepareStatement("UPDATE SensorData SET "
               + " Sdt_Id=?, Runtime=?, Tool=?, Resource=?, XmlSensorData=?, "
               + " XmlSensorDataRef=?, LastMod=?" + " WHERE Owner_Id=?" + andClause
               + "Tstamp=?");
@@ -139,7 +145,7 @@ public class PostgresImplementation extends DbImplementation {
         }
         // Insert a new sensordata record.
         else {
-          s = conn
+          s = this.connection
               .prepareStatement("INSERT INTO SensorData VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
           // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
           // XmlSensorData XmlSensorDataRef
@@ -170,7 +176,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         userResultSet.close();
         sdtResultSet.close();
         if (dataResultSet != null) {
@@ -197,17 +202,16 @@ public class PostgresImplementation extends DbImplementation {
    */
   private void storeSensorDataProperties(Object sensorDataId, String xmlSensorData,
       boolean isUpdating) {
-    Connection conn = null;
     PreparedStatement s = null;
 
     try {
-      conn = DriverManager.getConnection(connectionURL);
+      // conn = DriverManager.getConnection(connectionURL);
       Map<String, String> keyValMap = this.getPropertiesMap(xmlSensorData);
       // The sensordata properties exists, let's update it.
       if (isUpdating) {
         for (Map.Entry<String, String> entry : keyValMap.entrySet()) {
-          s = conn.prepareStatement("UPDATE SensorData_Properties SET " + " Key=?, Value=?"
-              + " WHERE SensorData_Id=?");
+          s = this.connection.prepareStatement("UPDATE SensorData_Properties SET "
+              + " Key=?, Value=?" + " WHERE SensorData_Id=?");
           s.setString(1, entry.getKey());
           s.setString(2, entry.getValue());
           s.setObject(3, sensorDataId, Types.OTHER);
@@ -218,7 +222,8 @@ public class PostgresImplementation extends DbImplementation {
       }
       else { // No properties, let's create a new record.
         for (Map.Entry<String, String> entry : keyValMap.entrySet()) {
-          s = conn.prepareStatement("INSERT INTO SensorData_Properties VALUES (?, ?, ?, ?)");
+          s = this.connection
+              .prepareStatement("INSERT INTO SensorData_Properties VALUES (?, ?, ?, ?)");
           // Order: Id SensorData_Id Key Value
           // XmlSensorData XmlSensorDataRef
           s.setObject(1, UUID.randomUUID(), Types.OTHER);
@@ -239,7 +244,6 @@ public class PostgresImplementation extends DbImplementation {
         if (s != null) {
           s.close();
         }
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -253,23 +257,17 @@ public class PostgresImplementation extends DbImplementation {
    * @return the properties map.
    */
   private Map<String, String> getPropertiesMap(String xmlSensorData) {
-    Map<String, String> keyValMap = new HashMap<String, String>();
     try {
-      JAXBContext jaxbContext = JAXBContext
-          .newInstance(org.hackystat.sensorbase.resource.sensordata.jaxb.ObjectFactory.class);
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      SensorData sensorData = (SensorData) unmarshaller.unmarshal(new StringReader(
-          xmlSensorData));
-      if (sensorData.getProperties() != null) {
-        for (Property property : sensorData.getProperties().getProperty()) {
-          keyValMap.put(property.getKey(), property.getValue());
-        }
-      }
+      SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+      SensorPropertiesHandler handler = new SensorPropertiesHandler();
+      parser.parse(new ByteArrayInputStream(xmlSensorData.getBytes()), handler);
+      return handler.getKeyValMap();
     }
-    catch (JAXBException e) {
-      this.logger.info(postgresError + StackTrace.toString(e));
+    catch (Exception e) {
+      this.logger
+          .warning("Error reading the sensor data properties:" + StackTrace.toString(e));
     }
-    return keyValMap;
+    return new HashMap<String, String>();
   }
 
   /**
@@ -323,7 +321,8 @@ public class PostgresImplementation extends DbImplementation {
    * the project with the specified project name.
    * @param conn the connection used to obtain the record.
    * @param projectName the name of project.
-   * @return the result set containing the record with the specified project uri.
+   * @return the result set containing the record with the specified project
+   * uri.
    * @throws SQLException thrown if the record could not be returned.
    */
   private ResultSet getProjectUriRecords(Connection conn, String projectName)
@@ -396,11 +395,9 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public String getSensorDataIndex(User user) {
-    Connection conn = null;
     ResultSet ownerResultSet = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResultSet = this.getUserRecord(conn, user.getEmail());
+      ownerResultSet = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResultSet.next()) {
         String st = "SELECT XmlSensorDataRef FROM SensorData WHERE" + ownerIdEquals
             + ownerResultSet.getObject("Id") + "'";
@@ -413,7 +410,6 @@ public class PostgresImplementation extends DbImplementation {
     finally {
       try {
         ownerResultSet.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -425,14 +421,12 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public String getSensorDataIndex(User user, String sdtName) {
-    Connection conn = null;
     ResultSet ownerResults = null;
     ResultSet sdtResults = null;
 
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResults = this.getUserRecord(conn, user.getEmail());
-      sdtResults = this.getSdtRecord(conn, sdtName);
+      ownerResults = this.getUserRecord(this.connection, user.getEmail());
+      sdtResults = this.getSdtRecord(this.connection, sdtName);
       if (ownerResults.next() && sdtResults.next()) {
         String st = selectPrefix + ownerIdEquals + ownerResults.getObject("Id")
             + quoteAndClause + sdtIdEquals + sdtResults.getObject("Id") + "'" + orderByTstamp;
@@ -444,7 +438,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         ownerResults.close();
         sdtResults.close();
       }
@@ -459,7 +452,6 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public String getSensorDataIndex(List<User> users, XMLGregorianCalendar startTime,
       XMLGregorianCalendar endTime, List<String> uriPatterns, String sdt) {
-    Connection conn = null;
     String statement = null;
     ResultSet results = null;
 
@@ -471,8 +463,7 @@ public class PostgresImplementation extends DbImplementation {
             + constructLikeClauses(uriPatterns) + orderByTstamp;
       }
       else { // Retrieve sensor data of the specified SDT.
-        conn = DriverManager.getConnection(connectionURL);
-        results = this.getSdtRecord(conn, sdt);
+        results = this.getSdtRecord(this.connection, sdt);
         if (results.next()) {
           statement = selectPrefix + constructOwnerClause(users) + andClause + sdtIdEquals
               + results.getObject("Id") + quoteAndClause + " (" + tstampBetweenTstamp
@@ -491,8 +482,7 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        if (conn != null) {
-          conn.close();
+        if (results != null) {
           results.close();
         }
       }
@@ -508,11 +498,9 @@ public class PostgresImplementation extends DbImplementation {
   public String getProjectSensorDataSnapshot(List<User> users, XMLGregorianCalendar startTime,
       XMLGregorianCalendar endTime, List<String> uriPatterns, String sdt, String tool) {
     String statement = null;
-    Connection conn = null;
     ResultSet results = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      results = this.getSdtRecord(conn, sdt);
+      results = this.getSdtRecord(this.connection, sdt);
       if (results.next()) {
         Object sdtId = results.getObject("Id");
         if (tool == null) { // Retrieve sensor data with latest runtime
@@ -544,7 +532,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         results.close();
       }
       catch (SQLException e) {
@@ -688,13 +675,11 @@ public class PostgresImplementation extends DbImplementation {
     StringBuffer buff = new StringBuffer();
     buff.append('(');
     // Use old school iterator so we can do a hasNext() inside the loop.
-    Connection conn = null;
     ResultSet results = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
       for (Iterator<User> i = users.iterator(); i.hasNext();) {
         User user = i.next();
-        results = this.getUserRecord(conn, user.getEmail());
+        results = this.getUserRecord(this.connection, user.getEmail());
         if (results.next()) {
           buff.append(ownerIdEquals);
           buff.append(results.getObject("Id"));
@@ -705,7 +690,6 @@ public class PostgresImplementation extends DbImplementation {
         }
       }
       buff.append(") ");
-      conn.close();
       return buff.toString();
     }
     catch (SQLException e) {
@@ -713,7 +697,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         results.close();
       }
       catch (SQLException e) {
@@ -758,19 +741,17 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public boolean hasSensorData(User user, XMLGregorianCalendar timestamp) {
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     ResultSet ownerResults = null;
     boolean isFound = false;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResults = this.getUserRecord(conn, user.getEmail());
+      ownerResults = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResults.next()) {
         String statement = selectPrefix + ownerIdEquals + ownerResults.getObject("Id")
             + quoteAndClause + " Tstamp='" + Tstamp.makeTimestamp(timestamp) + "'";
         server.getLogger().fine(executeQueryMsg + statement);
-        s = conn.prepareStatement(statement);
+        s = this.connection.prepareStatement(statement);
         rs = s.executeQuery();
         // If a record was retrieved, we'll enter the loop, otherwise we won't.
         while (rs.next()) {
@@ -784,7 +765,6 @@ public class PostgresImplementation extends DbImplementation {
     finally {
       try {
         s.close();
-        conn.close();
         ownerResults.close();
         if (rs != null) {
           rs.close();
@@ -800,16 +780,15 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteSensorData(User user, XMLGregorianCalendar timestamp) {
-    Connection conn = null;
     ResultSet ownerResults = null;
     ResultSet dataResults = null;
 
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResults = this.getUserRecord(conn, user.getEmail());
+      ownerResults = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResults.next()) {
         // Delete the properties related to a sensor data record.
-        dataResults = this.getSensorDataRecord(conn, ownerResults.getObject("Id"), timestamp);
+        dataResults = this.getSensorDataRecord(this.connection, ownerResults.getObject("Id"),
+            timestamp);
         while (dataResults.next()) {
           this.deleteSensorDataProperties(dataResults.getObject("Id"));
         }
@@ -826,7 +805,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         ownerResults.close();
         if (dataResults != null) {
           dataResults.close();
@@ -885,36 +863,17 @@ public class PostgresImplementation extends DbImplementation {
    * @param sensorDataId the sensor data id.
    */
   private void deleteSensorDataProperties(Object sensorDataId) {
-    Connection conn = null;
-    try {
-      conn = DriverManager.getConnection(connectionURL);
-      String statement = "DELETE FROM SensorData_Properties WHERE SensorData_Id='"
-          + sensorDataId + "'";
-      deleteResource(statement);
-    }
-    catch (SQLException e) {
-      this.logger.info(postgresError + StackTrace.toString(e));
-    }
-    finally {
-      try {
-        if (conn != null) {
-          conn.close();
-        }
-      }
-      catch (SQLException e) {
-        this.logger.warning(errorClosingMsg + StackTrace.toString(e));
-      }
-    }
+    String statement = "DELETE FROM SensorData_Properties WHERE SensorData_Id='"
+        + sensorDataId + "'";
+    deleteResource(statement);
   }
 
   /** {@inheritDoc} */
   @Override
   public String getSensorData(User user, XMLGregorianCalendar timestamp) {
-    Connection conn = null;
     ResultSet ownerResults = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResults = this.getUserRecord(conn, user.getEmail());
+      ownerResults = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResults.next()) {
         String statement = "SELECT XmlSensorData FROM SensorData WHERE" + ownerIdEquals
             + ownerResults.getObject("Id") + quoteAndClause + " Tstamp='"
@@ -927,7 +886,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         ownerResults.close();
       }
       catch (SQLException e) {
@@ -941,20 +899,19 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public boolean storeSensorDataType(SensorDataType sdt, String xmlSensorDataType,
       String xmlSensorDataTypeRef) {
-    Connection conn = null;
     PreparedStatement countStatement = null;
     PreparedStatement dataStatement = null;
     ResultSet countResultSet = null;
     try {
-      conn = DriverManager.getConnection(this.connectionURL);
       String countQuery = "SELECT * FROM SensorDataType where name='" + sdt.getName() + "'";
-      countStatement = conn.prepareStatement(countQuery, ResultSet.TYPE_SCROLL_SENSITIVE,
-          ResultSet.CONCUR_READ_ONLY);
+      countStatement = this.connection.prepareStatement(countQuery,
+          ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
       countResultSet = countStatement.executeQuery();
       // If an SDT with the same name exists, let's update it.
       if (countResultSet.next()) {
-        dataStatement = conn.prepareStatement("UPDATE SensorDataType SET " + " LastMod=?,"
-            + "XmlSensorDataType=?, " + " XmlSensorDataTypeRef=?" + " WHERE Name=?");
+        dataStatement = this.connection.prepareStatement("UPDATE SensorDataType SET "
+            + " LastMod=?," + "XmlSensorDataType=?, " + " XmlSensorDataTypeRef=?"
+            + " WHERE Name=?");
         dataStatement.setTimestamp(1, new Timestamp(new Date().getTime()));
         dataStatement.setString(2, xmlSensorDataType);
         dataStatement.setString(3, xmlSensorDataTypeRef);
@@ -964,7 +921,7 @@ public class PostgresImplementation extends DbImplementation {
       }
       // Insert the new SDT.
       else {
-        dataStatement = conn
+        dataStatement = this.connection
             .prepareStatement("INSERT INTO SensorDataType VALUES (?, ?, ?, ?, ?)");
         // Order: id name lastmod xmlsensordatatype xmlsensordatatyperef
         dataStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
@@ -981,7 +938,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         countStatement.close();
         dataStatement.close();
         countResultSet.close();
@@ -1037,22 +993,20 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public boolean storeUser(User user, String xmlUser, String xmlUserRef) {
-    Connection conn = null;
     PreparedStatement countStatement = null;
     PreparedStatement userStatement = null;
     ResultSet countResultSet = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
       String countQuery = "SELECT * FROM HackyUser where email='" + user.getEmail() + "'";
-      countStatement = conn.prepareStatement(countQuery, ResultSet.TYPE_SCROLL_SENSITIVE,
-          ResultSet.CONCUR_READ_ONLY);
+      countStatement = this.connection.prepareStatement(countQuery,
+          ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
       countResultSet = countStatement.executeQuery();
 
       // If the user with the same email exists, perform an update.
       if (countResultSet.next()) {
-        userStatement = conn.prepareStatement("UPDATE HackyUser SET " + " Password=?, "
-            + " Role=?, " + " LastMod=?," + " XmlUser=?, " + " XmlUserRef=? "
-            + " WHERE Email=?");
+        userStatement = this.connection.prepareStatement("UPDATE HackyUser SET "
+            + " Password=?, " + " Role=?, " + " LastMod=?," + " XmlUser=?, "
+            + " XmlUserRef=? " + " WHERE Email=?");
         userStatement.setString(1, user.getPassword());
         userStatement.setString(2, user.getRole());
         userStatement.setTimestamp(3, new Timestamp(new Date().getTime()));
@@ -1064,7 +1018,7 @@ public class PostgresImplementation extends DbImplementation {
       }
       // Insert the new user into the database.
       else {
-        userStatement = conn
+        userStatement = this.connection
             .prepareStatement("INSERT INTO HackyUser VALUES (?, ?, ?, ?, ?, ?, ?)");
         // Order: id email password role lastmod xmluser xmluserref
         userStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
@@ -1086,7 +1040,6 @@ public class PostgresImplementation extends DbImplementation {
         userStatement.close();
         countStatement.close();
         countResultSet.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1098,14 +1051,11 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteProject(User owner, String projectName) {
-    Connection conn = null;
     ResultSet projectUriResults = null;
     ResultSet userResults = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-
       // Removes the ProjectUri records associated with the project.
-      projectUriResults = this.getProjectUriRecords(conn, projectName);
+      projectUriResults = this.getProjectUriRecords(this.connection, projectName);
       if (projectUriResults.next()) {
         String statement = "DELETE FROM ProjectUri WHERE Id='"
             + projectUriResults.getObject("Id") + "'";
@@ -1113,7 +1063,7 @@ public class PostgresImplementation extends DbImplementation {
       }
 
       // Removes the Project.
-      userResults = this.getUserRecord(conn, owner.getEmail());
+      userResults = this.getUserRecord(this.connection, owner.getEmail());
       if (userResults.next()) {
         String statement = "DELETE FROM Project WHERE " + ownerIdEquals
             + userResults.getObject("Id") + quoteAndClause + " ProjectName = '" + projectName
@@ -1126,7 +1076,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         projectUriResults.close();
         userResults.close();
       }
@@ -1139,11 +1088,9 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public String getProject(User owner, String projectName) {
-    Connection conn = null;
     ResultSet userResults = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      userResults = this.getUserRecord(conn, owner.getEmail());
+      userResults = this.getUserRecord(this.connection, owner.getEmail());
       if (userResults.next()) {
         Object userId = userResults.getObject("Id");
         String statement = "SELECT XmlProject FROM Project WHERE" + ownerIdEquals + userId
@@ -1156,7 +1103,6 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         userResults.close();
       }
       catch (SQLException e) {
@@ -1176,7 +1122,6 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public ProjectSummary getProjectSummary(List<User> users, XMLGregorianCalendar startTime,
       XMLGregorianCalendar endTime, List<String> uriPatterns, String href) {
-    Connection conn = null;
     PreparedStatement dataStatement = null;
     ResultSet dataResultSet = null;
     ResultSet sdtResultSet = null;
@@ -1193,8 +1138,7 @@ public class PostgresImplementation extends DbImplementation {
           + Tstamp.makeTimestamp(endTime) + "')" + constructLikeClauses(uriPatterns);
 
       // Retrieve the sensordata for this project and time period.
-      conn = DriverManager.getConnection(connectionURL);
-      dataStatement = conn.prepareStatement(statement);
+      dataStatement = this.connection.prepareStatement(statement);
       dataResultSet = dataStatement.executeQuery();
       // Loop through all retrieved SensorData records.
       while (dataResultSet.next()) {
@@ -1203,8 +1147,8 @@ public class PostgresImplementation extends DbImplementation {
         String tool = dataResultSet.getString("Tool");
 
         String sdtQuery = "SELECT * FROM SensorDataType WHERE ID='" + sdtId + "';";
-        sdtStatement = conn.prepareStatement(sdtQuery, ResultSet.TYPE_SCROLL_SENSITIVE,
-            ResultSet.CONCUR_READ_ONLY);
+        sdtStatement = this.connection.prepareStatement(sdtQuery,
+            ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
         sdtResultSet = sdtStatement.executeQuery();
         if (sdtResultSet.next()) {
           // Don't want null SDTs or Tools, call them the empty string instead.
@@ -1242,7 +1186,6 @@ public class PostgresImplementation extends DbImplementation {
         if (sdtResultSet != null) {
           sdtResultSet.close();
         }
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1291,7 +1234,6 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public boolean storeProject(Project project, String xmlProject, String xmlProjectRef) {
-    Connection conn = null;
     PreparedStatement countStatement = null;
     PreparedStatement projectStatement = null;
     PreparedStatement projectUriStatement = null;
@@ -1301,14 +1243,13 @@ public class PostgresImplementation extends DbImplementation {
     ResultSet projectResultSet = null;
     try {
       // Get the amount of projects with the specified name.
-      conn = DriverManager.getConnection(connectionURL);
       String countQuery = "SELECT * FROM Project where ProjectName='" + project.getName()
           + "'";
-      countStatement = conn.prepareStatement(countQuery, ResultSet.TYPE_SCROLL_SENSITIVE,
-          ResultSet.CONCUR_READ_ONLY);
+      countStatement = this.connection.prepareStatement(countQuery,
+          ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
       countResultSet = countStatement.executeQuery();
 
-      userResultSet = this.getUserRecord(conn, project.getOwner());
+      userResultSet = this.getUserRecord(this.connection, project.getOwner());
       if (userResultSet.next()) {
         // Get the user associated with the inserted/updated project.
         Object ownerId = userResultSet.getObject("Id");
@@ -1316,7 +1257,7 @@ public class PostgresImplementation extends DbImplementation {
         // If a project with the same name exists, let's update the record.
         if (countResultSet.next()) {
           // First, delete the ProjectUri Records linked to the updated Project.
-          projectUriResultSet = this.getProjectUriRecords(conn, project.getName());
+          projectUriResultSet = this.getProjectUriRecords(this.connection, project.getName());
           while (projectUriResultSet.next()) {
             String statement = "DELETE FROM ProjectUri WHERE Id='"
                 + projectUriResultSet.getObject("Id") + "'";
@@ -1325,10 +1266,10 @@ public class PostgresImplementation extends DbImplementation {
 
           // Then add the new uri record. A remove and add action is done
           // because there is no way to figure out which project uri to update.
-          projectResultSet = this.getProjectRecord(conn, project.getName());
+          projectResultSet = this.getProjectRecord(this.connection, project.getName());
           projectResultSet.next();
           for (String pattern : project.getUriPatterns().getUriPattern()) {
-            projectUriStatement = conn
+            projectUriStatement = this.connection
                 .prepareStatement("INSERT INTO ProjectUri VALUES (?, ?, ?)");
             // Order: Id Project_Id Uri
             projectUriStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
@@ -1337,7 +1278,7 @@ public class PostgresImplementation extends DbImplementation {
             projectUriStatement.executeUpdate();
           }
 
-          projectStatement = conn.prepareStatement("UPDATE Project SET "
+          projectStatement = this.connection.prepareStatement("UPDATE Project SET "
               + " StartTime=?, EndTime=?, LastMod=?, XmlProject=?, XmlProjectRef=?"
               + " WHERE Owner_Id=?" + andClause + "ProjectName=?");
           projectStatement.setTimestamp(1, Tstamp.makeTimestamp(project.getStartTime()));
@@ -1352,7 +1293,7 @@ public class PostgresImplementation extends DbImplementation {
         }
         // Let's create a new project record.
         else {
-          projectStatement = conn
+          projectStatement = this.connection
               .prepareStatement("INSERT INTO Project VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
           // Order: Id ProjectName Owner_Id StartTime EndTime LastMod XmlProject
           // XmlProjectRef
@@ -1368,7 +1309,7 @@ public class PostgresImplementation extends DbImplementation {
           projectStatement.executeUpdate();
 
           for (String pattern : project.getUriPatterns().getUriPattern()) {
-            projectUriStatement = conn
+            projectUriStatement = this.connection
                 .prepareStatement("INSERT INTO ProjectUri VALUES (?, ?, ?)");
             // Order: Id Project_Id Uri
             projectUriStatement.setObject(1, UUID.randomUUID(), Types.OTHER);
@@ -1398,7 +1339,6 @@ public class PostgresImplementation extends DbImplementation {
         countStatement.close();
         countResultSet.close();
         userResultSet.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1419,12 +1359,10 @@ public class PostgresImplementation extends DbImplementation {
     StringBuilder builder = new StringBuilder(512);
     builder.append("<").append(resourceName).append(indexSuffix);
     // Retrieve all the SensorData
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      s = conn.prepareStatement(statement);
+      s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
       String resourceRefColumnName = xml + resourceName + "Ref";
       while (rs.next()) {
@@ -1438,7 +1376,6 @@ public class PostgresImplementation extends DbImplementation {
       try {
         rs.close();
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1462,13 +1399,12 @@ public class PostgresImplementation extends DbImplementation {
     StringBuilder builder = new StringBuilder(512);
     builder.append("<").append(resourceName).append(indexSuffix);
     // Retrieve all the SensorData
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     String firstRunTime = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      s = conn.prepareStatement(statement);
+      this.connection = DriverManager.getConnection(connectionURL);
+      s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
       String resourceRefColumnName = xml + resourceName + "Ref";
       boolean finished = false;
@@ -1501,7 +1437,6 @@ public class PostgresImplementation extends DbImplementation {
       try {
         rs.close();
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1528,12 +1463,10 @@ public class PostgresImplementation extends DbImplementation {
     StringBuilder builder = new StringBuilder(512);
     builder.append("<").append(resourceName).append(indexSuffix);
     // Retrieve all the SensorData to start.
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      s = conn.prepareStatement(statement);
+      s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
       int currIndex = 0;
       int totalInstances = 0;
@@ -1553,7 +1486,6 @@ public class PostgresImplementation extends DbImplementation {
       try {
         rs.close();
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1572,13 +1504,11 @@ public class PostgresImplementation extends DbImplementation {
    */
   private String getResource(String resourceName, String statement) {
     StringBuilder builder = new StringBuilder(512);
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
       server.getLogger().fine(executeQueryMsg + statement);
-      s = conn.prepareStatement(statement);
+      s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
       String resourceXmlColumnName = xml + resourceName;
       while (rs.next()) { // the select statement must guarantee only one row is
@@ -1593,7 +1523,6 @@ public class PostgresImplementation extends DbImplementation {
       try {
         rs.close();
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1607,12 +1536,10 @@ public class PostgresImplementation extends DbImplementation {
    * @param statement The SQL delete statement.
    */
   private void deleteResource(String statement) {
-    Connection conn = null;
     PreparedStatement s = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
       server.getLogger().fine("Postgres: " + statement);
-      s = conn.prepareStatement(statement);
+      s = this.connection.prepareStatement(statement);
       s.executeUpdate();
     }
     catch (SQLException e) {
@@ -1621,7 +1548,6 @@ public class PostgresImplementation extends DbImplementation {
     finally {
       try {
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         e.printStackTrace();
@@ -1644,13 +1570,11 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public int getRowCount(String table) {
     int numRows = -1;
-    Connection conn = null;
     PreparedStatement s = null;
     ResultSet rs = null;
     String statement = "Select COUNT(1) from " + table;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      s = conn.prepareStatement(statement);
+      s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
       rs.next();
       numRows = rs.getInt(1);
@@ -1662,7 +1586,6 @@ public class PostgresImplementation extends DbImplementation {
       try {
         rs.close();
         s.close();
-        conn.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
@@ -1686,13 +1609,11 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public String getSensorDataIndex(List<User> users, XMLGregorianCalendar startTime,
       XMLGregorianCalendar endTime, List<String> uriPatterns, String sdt, String tool) {
-    Connection conn = null;
     String statement = null;
     ResultSet results = null;
 
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      results = this.getSdtRecord(conn, sdt);
+      results = this.getSdtRecord(this.connection, sdt);
       if (results.next()) {
         statement = selectPrefix + constructOwnerClause(users) + andClause + sdtIdEquals
             + results.getObject("Id") + quoteAndClause + toolEquals + tool + quoteAndClause
@@ -1708,10 +1629,7 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        if (conn != null) {
-          conn.close();
-          results.close();
-        }
+        results.close();
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));

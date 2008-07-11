@@ -77,3 +77,13 @@ CREATE TABLE SENSORDATA_PROPERTIES (
     REFERENCES SENSORDATA (ID)
     ON DELETE CASCADE
     ON UPDATE NO ACTION);
+
+CREATE INDEX TstampIndex ON SensorData(Tstamp asc);
+CREATE INDEX RuntimeIndex ON SensorData(Runtime desc);
+CREATE INDEX ToolIndex ON SensorData(Tool asc);
+CREATE INDEX UserIndex ON HackyUser(email asc);
+CREATE INDEX SdtNameIndex ON SensorDataType(name asc);
+CREATE INDEX OwnerIdIndex ON SensorData(owner_id asc);
+
+
+
