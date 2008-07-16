@@ -352,21 +352,6 @@ public class PostgresImplementation extends DbImplementation {
     return statement.executeQuery();
   }
 
-  /**
-   * The helper method used to return a SensorData ResultSet which has the
-   * specified owner.
-   * @param conn the connection used to obtain the record.
-   * @param ownerId the record id of the user owning the returned SensorData.
-   * @return the result set containing the sensor data record.
-   * @throws SQLException thrown if the record could not be returned.
-   */
-  private ResultSet getSensorDataRecord(Connection conn, Object ownerId) throws SQLException {
-    String query = "SELECT * FROM SensorData where" + ownerIdEquals + ownerId + "'";
-    PreparedStatement statement = conn.prepareStatement(query,
-        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-    return statement.executeQuery();
-  }
-
   /** {@inheritDoc} */
   @Override
   public boolean isFreshlyCreated() {
@@ -781,19 +766,10 @@ public class PostgresImplementation extends DbImplementation {
   @Override
   public void deleteSensorData(User user, XMLGregorianCalendar timestamp) {
     ResultSet ownerResults = null;
-    ResultSet dataResults = null;
 
     try {
       ownerResults = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResults.next()) {
-        // Delete the properties related to a sensor data record.
-        dataResults = this.getSensorDataRecord(this.connection, ownerResults.getObject("Id"),
-            timestamp);
-        while (dataResults.next()) {
-          this.deleteSensorDataProperties(dataResults.getObject("Id"));
-        }
-
-        // Then, let's delete the sensor data record.
         String statement = "DELETE FROM SensorData WHERE " + ownerIdEquals
             + ownerResults.getObject("Id") + quoteAndClause + " Tstamp='"
             + Tstamp.makeTimestamp(timestamp) + "'";
@@ -806,9 +782,6 @@ public class PostgresImplementation extends DbImplementation {
     finally {
       try {
         ownerResults.close();
-        if (dataResults != null) {
-          dataResults.close();
-        }
       }
       catch (SQLException e) {
         this.logger.warning("Derby: Error closing the connection" + StackTrace.toString(e));
@@ -819,20 +792,10 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteSensorData(User user) {
-    Connection conn = null;
     ResultSet ownerResults = null;
-    ResultSet dataResults = null;
     try {
-      conn = DriverManager.getConnection(connectionURL);
-      ownerResults = this.getUserRecord(conn, user.getEmail());
+      ownerResults = this.getUserRecord(this.connection, user.getEmail());
       if (ownerResults.next()) {
-        // Delete the properties related to a sensor data record.
-        dataResults = this.getSensorDataRecord(conn, ownerResults.getObject("Id"));
-        while (dataResults.next()) {
-          this.deleteSensorDataProperties(dataResults.getObject("Id"));
-        }
-
-        // Then, let's delete the sensor data record.
         String statement = "DELETE FROM SensorData WHERE" + ownerIdEquals
             + ownerResults.getObject("Id") + "'";
         deleteResource(statement);
@@ -843,29 +806,12 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        conn.close();
         ownerResults.close();
-        if (dataResults != null) {
-          dataResults.close();
-        }
       }
       catch (SQLException e) {
         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
       }
     }
-    // compressTables(); // this should be done separately as part of some
-    // maintenance.
-  }
-
-  /**
-   * Removes the SensorData_Properties record with the specified SensorData
-   * record id.
-   * @param sensorDataId the sensor data id.
-   */
-  private void deleteSensorDataProperties(Object sensorDataId) {
-    String statement = "DELETE FROM SensorData_Properties WHERE SensorData_Id='"
-        + sensorDataId + "'";
-    deleteResource(statement);
   }
 
   /** {@inheritDoc} */
