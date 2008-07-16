@@ -86,6 +86,17 @@ public class PostgresImplementation extends DbImplementation {
     this.connectionURL = "jdbc:postgresql:" + props.get(PostgresServerProperties.POSTGRES_DB)
         + "?user=" + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
         + props.get(PostgresServerProperties.POSTGRES_PASSWORD);
+    // Try to load the derby driver. 
+    try {
+      Class.forName("org.postgresql.Driver"); 
+    } 
+    catch (java.lang.ClassNotFoundException e) {
+      String msg = "Postgres: Exception during DbManager initialization: "
+        + "Postgres not on CLASSPATH.";
+      this.logger.warning(msg + "\n" + StackTrace.toString(e));
+      throw new RuntimeException(msg, e);
+    }
+
     try {
       this.connection = DriverManager.getConnection(this.connectionURL);
     }
@@ -1512,13 +1523,17 @@ public class PostgresImplementation extends DbImplementation {
     return true;
   }
 
-  /** {@inheritDoc} */
+  /** 
+   * {@inheritDoc}. This is an estimate, it turns out that postgreSQL has some problems
+   * counting its row counts. 
+   */
   @Override
   public int getRowCount(String table) {
     int numRows = -1;
     PreparedStatement s = null;
     ResultSet rs = null;
-    String statement = "Select COUNT(1) from " + table;
+    String statement = "select n_live_tup, relname, last_analyze from pg_stat_user_tables " 
+      + " where relname = '" + table.toLowerCase() + "'";
     try {
       s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
@@ -1526,7 +1541,7 @@ public class PostgresImplementation extends DbImplementation {
       numRows = rs.getInt(1);
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in getRowCount: " + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in getRowCount: " + StackTrace.toString(e));
     }
     finally {
       try {
