@@ -74,10 +74,14 @@ public class PostgresImplementation extends DbImplementation {
   private static final String postgresError = "Postgres: Error ";
   private static final String indexSuffix = "Index>";
   private static final String xml = "Xml";
+  
+  /** The SQL state indicating that INSERT tried to add data to a table with a preexisting key. */
+  private static final String DUPLICATE_KEY = "23505";
+
 
   /**
    * Instantiates the Postgres implementation. Throws a Runtime exception if the
-   * Derby jar file cannot be found on the classpath.
+   * Postgres jar file cannot be found on the classpath.
    * @param server The SensorBase server instance.
    */
   public PostgresImplementation(Server server) {
@@ -99,6 +103,7 @@ public class PostgresImplementation extends DbImplementation {
 
     try {
       this.connection = DriverManager.getConnection(this.connectionURL);
+      this.connection.setAutoCommit(false);
     }
     catch (SQLException e) {
       this.logger.warning("Postgres: failed to open connection." + StackTrace.toString(e));
@@ -113,7 +118,48 @@ public class PostgresImplementation extends DbImplementation {
 
   /** {@inheritDoc} */
   @Override
-  public boolean storeSensorData(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
+   public boolean storeSensorData(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
+     PreparedStatement preparedStatement = null;
+     try {
+       preparedStatement = this.connection.prepareStatement("INSERT INTO SensorData VALUES (?, "
+           + "(select id from hackyuser where email = ?), ?, "
+           + "(select id from sensordatatype where name = ?), ?, ?, ?, ?, ?, ?)");
+       // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
+       // XmlSensorData XmlSensorDataRef
+       Object uuid = UUID.randomUUID();
+       preparedStatement.setObject(1, uuid, Types.OTHER);
+       preparedStatement.setString(2, data.getOwner());
+       preparedStatement.setTimestamp(3, Tstamp.makeTimestamp(data.getTimestamp()));
+       preparedStatement.setString(4, data.getSensorDataType());
+       preparedStatement.setTimestamp(5, Tstamp.makeTimestamp(data.getRuntime()));
+       preparedStatement.setString(6, data.getTool());
+       preparedStatement.setString(7, data.getResource());
+       preparedStatement.setTimestamp(8, new Timestamp(new Date().getTime()));
+       preparedStatement.setString(9, xmlSensorData);
+       preparedStatement.setString(10, xmlSensorDataRef);
+       preparedStatement.executeUpdate();
+       this.storeSensorDataProperties(uuid, xmlSensorData, false);
+       this.logger.fine("Postgres: Inserted " + data.getOwner() + " " + data.getTimestamp());
+
+     }
+     catch (SQLException e) {
+       if (DUPLICATE_KEY.equals(e.getSQLState())) {
+         this.logger.fine("Postgres: Not Updated " + data.getOwner() + " " + data.getTimestamp());
+       }
+     }
+     finally {
+       try {
+         preparedStatement.close();
+       }
+       catch (SQLException e) {
+         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
+       }
+     }
+     return true;
+   }
+  
+  /** {@inheritDoc} */
+  public boolean storeSensorData2(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
     PreparedStatement s = null;
     ResultSet userResultSet = null;
     ResultSet sdtResultSet = null;
@@ -756,7 +802,7 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in hasSensorData()" + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in hasSensorData()" + StackTrace.toString(e));
     }
     finally {
       try {
@@ -767,7 +813,7 @@ public class PostgresImplementation extends DbImplementation {
         }
       }
       catch (SQLException e) {
-        this.logger.warning("Derby: Error closing the connection" + StackTrace.toString(e));
+        this.logger.warning("Postgres: Error closing the connection" + StackTrace.toString(e));
       }
     }
     return isFound;
@@ -795,7 +841,7 @@ public class PostgresImplementation extends DbImplementation {
         ownerResults.close();
       }
       catch (SQLException e) {
-        this.logger.warning("Derby: Error closing the connection" + StackTrace.toString(e));
+        this.logger.warning("Postgres: Error closing the connection" + StackTrace.toString(e));
       }
     }
   }
@@ -803,6 +849,12 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteSensorData(User user) {
+    // no op for now. 
+    if (true) {
+      this.logger.fine("Postgres: Not Deleted" + user.getEmail());
+      return;       
+    }
+
     ResultSet ownerResults = null;
     try {
       ownerResults = this.getUserRecord(this.connection, user.getEmail());
@@ -971,7 +1023,7 @@ public class PostgresImplementation extends DbImplementation {
         userStatement.setString(5, xmlUserRef);
         userStatement.setString(6, user.getEmail());
         userStatement.executeUpdate();
-        this.logger.fine("Derby: Updated User " + user.getEmail());
+        this.logger.fine("Postgres: Updated User " + user.getEmail());
       }
       // Insert the new user into the database.
       else {
@@ -1327,7 +1379,7 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in getIndex()" + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in getIndex()" + StackTrace.toString(e));
     }
     finally {
       try {
@@ -1388,7 +1440,7 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in getIndex()" + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in getIndex()" + StackTrace.toString(e));
     }
     finally {
       try {
@@ -1437,7 +1489,7 @@ public class PostgresImplementation extends DbImplementation {
       }
     }
     catch (SQLException e) {
-      this.logger.info("Derby: Error in getIndex()" + StackTrace.toString(e));
+      this.logger.info("Postgres: Error in getIndex()" + StackTrace.toString(e));
     }
     finally {
       try {
