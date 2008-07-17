@@ -139,11 +139,54 @@ public class PostgresImplementation extends DbImplementation {
        preparedStatement.executeUpdate();
        this.storeSensorDataProperties(uuid, xmlSensorData, false);
        this.logger.fine("Postgres: Inserted " + data.getOwner() + " " + data.getTimestamp());
-
      }
      catch (SQLException e) {
        if (DUPLICATE_KEY.equals(e.getSQLState())) {
-         this.logger.fine("Postgres: Not Updated " + data.getOwner() + " " + data.getTimestamp());
+         PreparedStatement sensordataIdStatement = null;
+         ResultSet sensordataIdResultSet = null;
+         try {
+           preparedStatement = this.connection.prepareStatement("UPDATE SensorData SET "
+               + " sdt_id=(select id from sensordatatype where name = ?), runtime=?, tool=?, " 
+               + " resource=?, xmlsensordata=?, xmlsensordataRef=?, lastmod=?"
+               + " WHERE owner_id=(select id from hackyuser where email = ?) AND tstamp=?");
+           // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
+           // XmlSensorData XmlSensorDataRef
+           preparedStatement.setString(1, data.getSensorDataType());
+           preparedStatement.setTimestamp(2, Tstamp.makeTimestamp(data.getRuntime()));
+           preparedStatement.setString(3, data.getTool());
+           preparedStatement.setString(4, data.getResource());
+           preparedStatement.setString(5, xmlSensorData);
+           preparedStatement.setString(6, xmlSensorDataRef);
+           preparedStatement.setTimestamp(7, new Timestamp(new Date().getTime()));
+           preparedStatement.setString(8, data.getOwner());
+           preparedStatement.setTimestamp(9, Tstamp.makeTimestamp(data.getTimestamp()));
+           preparedStatement.executeUpdate();
+           
+           String query = "SELECT sensordata.id FROM SensorData, hackyuser where email = '"  
+             + data.getOwner() + "' and sensordata.owner_id = hackyuser.id AND "
+             + " SensorData.Tstamp = '" + Tstamp.makeTimestamp(data.getTimestamp()) + "'";
+           sensordataIdStatement = this.connection.prepareStatement(query);
+           sensordataIdResultSet = sensordataIdStatement.executeQuery();
+           Object uuid = null;
+           if (sensordataIdResultSet.next()) {
+             uuid = sensordataIdResultSet.getObject(1);
+           }
+           
+           this.storeSensorDataProperties(uuid, xmlSensorData, true);
+         }
+         catch (SQLException f) {
+           this.logger.info(postgresError + StackTrace.toString(f));
+         }
+         finally {
+           try {
+             sensordataIdStatement.close();
+             sensordataIdResultSet.close();
+           }
+           catch (SQLException e2) {
+             this.logger.warning(errorClosingMsg + StackTrace.toString(e2));
+           }
+         }
+         this.logger.fine("Postgres: Updated " + data.getOwner() + " " + data.getTimestamp());
        }
      }
      finally {
@@ -848,11 +891,11 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteSensorData(User user) {
-    // no op for now. 
-    if (true) {
-      this.logger.fine("Postgres: Not Deleted" + user.getEmail());
-      return;       
-    }
+// no op for now. 
+//    if (true) {
+//      this.logger.fine("Postgres: Not Deleted" + user.getEmail());
+//      return;       
+//    }
 
     ResultSet ownerResults = null;
     try {
@@ -1190,7 +1233,9 @@ public class PostgresImplementation extends DbImplementation {
       try {
         dataResultSet.close();
         dataStatement.close();
-        sdtStatement.close();
+        if (sdtStatement != null) {
+          sdtStatement.close();
+        }
         if (sdtResultSet != null) {
           sdtResultSet.close();
         }
@@ -1340,6 +1385,9 @@ public class PostgresImplementation extends DbImplementation {
         }
         if (projectUriStatement != null) {
           projectUriStatement.close();
+        }
+        if (projectUriResultSet != null) {
+          projectUriResultSet.close();
         }
         if (projectResultSet != null) {
           projectResultSet.close();
