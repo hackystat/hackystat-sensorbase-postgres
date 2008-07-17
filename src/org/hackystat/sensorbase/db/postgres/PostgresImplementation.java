@@ -103,7 +103,6 @@ public class PostgresImplementation extends DbImplementation {
 
     try {
       this.connection = DriverManager.getConnection(this.connectionURL);
-      this.connection.setAutoCommit(false);
     }
     catch (SQLException e) {
       this.logger.warning("Postgres: failed to open connection." + StackTrace.toString(e));
