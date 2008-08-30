@@ -9,14 +9,11 @@
   <property name="junit.dir" location="${build.dir}/junit" />
 
   <target name="emma" depends="clean, emma.tool, emma.report, emma.sensor, emma.echo" unless="emma.disabled" description="Runs Emma." />
-
+	
   <target name="emma.tool" depends="compile" unless="emma.disabled" description="Cleans, compiles, instruments byte codes, runs unit tests, generates Emma report.">
     <!-- Verify that Emma is installed. -->
     <available file="${env.EMMA_HOME}/lib/emma.jar" property="emma.available" />
     <fail unless="emma.available" message="Error: EMMA_HOME not set or ${env.EMMA_HOME}/lib/emma.jar not found, indicating Emma is not installed." />
-
-  	<!-- Extract the sensorbase.jar class files. -->
-  	<unzip src="${basedir}/sensorbase.jar" dest="${build.dir}/classes"/>
   	
     <!-- Define the path and taskdef containing the emma binaries. -->
     <property name="emma.lib.dir" value="${env.EMMA_HOME}/lib" />
@@ -38,9 +35,14 @@
     <!-- Run JUnit with the instrumented class files. -->
     <mkdir dir="${junit.dir}" />
     <junit printsummary="withOutAndErr" fork="yes">
-      <classpath path="${build.dir}/classes;${java.class.path}">
+      <sysproperty key="sensorbase.db.impl" value="org.hackystat.sensorbase.db.postgres.PostgresImplementation" />
+      <sysproperty key="sensorbase.db.postgres.db" value="hackystat_test" />
+      <sysproperty key="sensorbase.db.postgres.user" value="hackystat_test" />
+      <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" />    	    	
+      <classpath>
         <path refid="emma.lib.dir" />
         <path refid="compile.classpath" />
+      	<pathelement location="${build.dir}/classes" />
         <pathelement location="${lib.dir}/uricache" />
       </classpath>
       <sysproperty key="emma.coverage.out.file" value="${build.dir}/emma/coverage.emma" />
@@ -49,10 +51,11 @@
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
+      	<fileset dir="${env.HACKYSTAT_SENSORBASE_HOME}\src" includes="**/Test*.java" />
         <fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
-
+  	
     <!-- Generate Emma reports. -->
     <emma enabled="true">
       <report sourcepath="${src.dir}" sort="+name" metrics="method:70,block:80,line:80,class:100">
@@ -102,6 +105,3 @@
     <hackystat.emma emma.datafiles.fileset="emma.datafiles" emma.sourcefiles.fileset="emma.sourcefiles" verbose="${hackystat.verbose.mode}" />
   </target>
 </project>
-
-
-

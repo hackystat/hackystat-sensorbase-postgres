@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="var" path="RESTLET_HOME/lib/org.restlet.jar"/>
 	<classpathentry kind="var" path="RESTLET_HOME/lib/com.noelios.restlet.jar"/>
 	<classpathentry kind="var" path="RESTLET_HOME/lib/com.noelios.restlet.ext.simple_3.1.jar"/>
@@ -16,6 +15,7 @@
 	<classpathentry kind="var" path="HACKYSTAT_UTILITIES_HOME/time.lib.jar"/>
 	<classpathentry kind="var" path="HACKYSTAT_UTILITIES_HOME/hackystatuserhome.lib.jar"/>
 	<classpathentry kind="var" path="POSTGRES_DRIVER_HOME/postgresql-8.3-603.jdbc4.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/hackystat-sensorbase-uh"/>
+	<classpathentry kind="var" path="HACKYSTAT_SENSORBASE_HOME/sensorbase.jar" sourcepath="/HACKYSTAT_SENSORBASE_HOME"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

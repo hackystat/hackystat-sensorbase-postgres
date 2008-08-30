@@ -31,8 +31,8 @@ import org.hackystat.sensorbase.resource.projects.jaxb.SensorDataSummary;
 import org.hackystat.sensorbase.resource.sensordata.jaxb.SensorData;
 import org.hackystat.sensorbase.resource.sensordatatypes.jaxb.SensorDataType;
 import org.hackystat.sensorbase.resource.users.jaxb.User;
-import org.hackystat.sensorbase.server.PostgresServerProperties;
 import org.hackystat.sensorbase.server.Server;
+import org.hackystat.sensorbase.server.ServerProperties;
 import org.hackystat.utilities.stacktrace.StackTrace;
 import org.hackystat.utilities.tstamp.Tstamp;
 
@@ -74,6 +74,12 @@ public class PostgresImplementation extends DbImplementation {
   private static final String postgresError = "Postgres: Error ";
   private static final String indexSuffix = "Index>";
   private static final String xml = "Xml";
+  /** The postgres database name. */
+  public static final String POSTGRES_DB = "sensorbase.db.postgres.db";
+  /** The postgres server username. */
+  public static final String POSTGRES_USER = "sensorbase.db.postgres.user";
+  /** The postgres server password. */
+  public static final String POSTGRES_PASSWORD = "sensorbase.db.postgres.password";
   
   /** The SQL state indicating that INSERT tried to add data to a table with a preexisting key. */
   private static final String DUPLICATE_KEY = "23505";
@@ -86,10 +92,11 @@ public class PostgresImplementation extends DbImplementation {
    */
   public PostgresImplementation(Server server) {
     super(server);
-    PostgresServerProperties props = new PostgresServerProperties();
-    this.connectionURL = "jdbc:postgresql:" + props.get(PostgresServerProperties.POSTGRES_DB)
-        + "?user=" + props.get(PostgresServerProperties.POSTGRES_USER) + "&password="
-        + props.get(PostgresServerProperties.POSTGRES_PASSWORD);
+    ServerProperties props = new ServerProperties();
+    System.out.println(props.get(POSTGRES_DB));
+    this.connectionURL = "jdbc:postgresql:" + props.get(POSTGRES_DB)
+        + "?user=" + props.get(POSTGRES_USER) + "&password="
+        + props.get(POSTGRES_PASSWORD);
     // Try to load the derby driver. 
     try {
       Class.forName("org.postgresql.Driver"); 

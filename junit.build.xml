@@ -5,21 +5,22 @@
 
   <import file="build.xml" />
   <property name="junit.dir" location="${build.dir}/junit" />
-  <property name="junit.version" value="4.4" />
+  
   <target name="junit" depends="junit.tool, junit.report, junit.sensor" description="Runs JUnit, JunitReport">
     <fail if="junit.failed">JUnit test case(s) failed.</fail>
   </target>
 
   <target name="junit.tool" depends="compile" description="Run JUnit tests.">
     <mkdir dir="${junit.dir}" />
-
-  	<!-- Extracts the sensorbase.jar file for unit testing. -->
-  	<unzip src="${basedir}/sensorbase.jar" dest="${build.dir}/classes" />
   	
     <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
     <!-- Fork is on until I can figure out how to stop the sensorbase and unbind the port. -->
     <!-- Note that emma is forking in its JUnit as well. -->
     <junit printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes" failureproperty="junit.failed">
+      <sysproperty key="sensorbase.db.impl" value="org.hackystat.sensorbase.db.postgres.PostgresImplementation" />
+      <sysproperty key="sensorbase.db.postgres.db" value="hackystat_test" />
+      <sysproperty key="sensorbase.db.postgres.user" value="hackystat_test" />
+      <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" />    	
       <classpath>
         <pathelement location="${build.dir}/classes" />
         <path refid="compile.classpath" />
@@ -28,6 +29,7 @@
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
+      	<fileset dir="${env.HACKYSTAT_SENSORBASE_HOME}\src" includes="**/Test*.java" />
       	<fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
@@ -50,8 +52,6 @@
     <fileset id="junit.sourcefiles" dir="${src.dir}" includes="**/Test*.java" />
     <hackystat.junit junit.sourcefiles.fileset="junit.sourcefiles" junit.datafiles.fileset="junit.datafiles" verbose="${hackystat.verbose.mode}" />
   </target>
-
-
 </project>
 
 
