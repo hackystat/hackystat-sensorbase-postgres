@@ -61,8 +61,9 @@
   <!-- Basic directory structure. -->
   <property name="src.dir" location="${basedir}/src" />
   <property name="lib.dir" location="${basedir}/lib" />
-  <property name="build.dir" location="${basedir}/build" />
-
+  <property name="build.dir" location="${basedir}/build" /> 
+  <property name="sensorbase-uh.build.dir" location="${env.HACKYSTAT_SENSORBASE_HOME}/build" />
+	
   <!-- The compile classpath is useful to many tools. -->
   <path id="compile.classpath">
   	<fileset file="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" />
@@ -84,19 +85,23 @@
 	
   <target name="compile-sensorbase-uh" description="Compiles the sensorbase-uh code.">
 	<!-- Now compile the code into build/classes -->
-	<mkdir dir="${env.HACKYSTAT_SENSORBASE_HOME}/classes" />
-	<javac srcdir="${env.HACKYSTAT_SENSORBASE_HOME}/src" destdir="${env.HACKYSTAT_SENSORBASE_HOME}/build/classes" source="1.5" target="1.5" debug="on" includeAntRuntime="no">
+	<mkdir dir="${sensorbase-uh.build.dir}/classes" />
+	<javac srcdir="${env.HACKYSTAT_SENSORBASE_HOME}/src" destdir="${sensorbase-uh.build.dir}/classes" source="1.5" target="1.5" debug="on" includeAntRuntime="no">
 	<classpath refid="compile.classpath" />
 	  <compilerarg value="-Xlint:all" />
 	<compilerarg value="-Werror" />
 	</javac>
   </target>	
 
-  <target name="clean" description="Delete build/ directory and top-level sensorbase-postgrest.jar files.">
+  <target name="clean" depends="clean-sensorbase-uh" description="Delete build/ directory and top-level sensorbase-postgrest.jar files.">
     <delete>
       <fileset dir="${basedir}" includes="sensorbase-postgres.jar" />
     </delete>
     <delete dir="${build.dir}" />
+  </target>
+	
+  <target name="clean-sensorbase-uh" description="Delete build/ directory of the hackystat-sensorbase-uh module.">
+	<delete dir="${sensorbase-uh.build.dir}/classes" />
   </target>
 
   <target name="convertLineEndings" description="Makes line endings compatible with host platform.">

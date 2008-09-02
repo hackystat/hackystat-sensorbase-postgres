@@ -23,6 +23,8 @@
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib.dir" />
 
+
+  	
     <!-- Instrument the .class files. -->
     <mkdir dir="${emma.dir}" />
     <emma enabled="true">
@@ -51,7 +53,7 @@
       <formatter type="xml" />
       <batchtest todir="${junit.dir}">
         <fileset dir="${src.dir}" includes="**/Test*.java" />
-      	<fileset dir="${env.HACKYSTAT_SENSORBASE_HOME}\src" includes="**/Test*.java" />
+      	<fileset dir="${sensorbase-uh.build.dir}/classes" includes="org/hackystat/**/Test*.class" />
         <fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>

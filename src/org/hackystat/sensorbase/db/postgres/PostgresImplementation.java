@@ -93,7 +93,6 @@ public class PostgresImplementation extends DbImplementation {
   public PostgresImplementation(Server server) {
     super(server);
     ServerProperties props = new ServerProperties();
-    System.out.println(props.get(POSTGRES_DB));
     this.connectionURL = "jdbc:postgresql:" + props.get(POSTGRES_DB)
         + "?user=" + props.get(POSTGRES_USER) + "&password="
         + props.get(POSTGRES_PASSWORD);
