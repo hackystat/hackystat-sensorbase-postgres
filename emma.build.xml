@@ -22,8 +22,6 @@
       <pathelement location="${emma.lib.dir}/emma_ant.jar" />
     </path>
     <taskdef resource="emma_ant.properties" classpathref="emma.lib.dir" />
-
-
   	
     <!-- Instrument the .class files. -->
     <mkdir dir="${emma.dir}" />
@@ -71,7 +69,7 @@
     </emma>
     <!-- Now delete the instrumented .class files-->
     <delete dir="${build.dir}/classes" />
-  	<antcall target="compile" />
+  	<ant antfile="jar.build.xml"/> 
   </target>
 
   <target name="emma.report" unless="emma.disabled" description="Generates XML and HTML reports.">

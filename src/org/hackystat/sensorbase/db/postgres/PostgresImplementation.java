@@ -205,97 +205,6 @@ public class PostgresImplementation extends DbImplementation {
      }
      return true;
    }
-  
-  /** {@inheritDoc} */
-  public boolean storeSensorData2(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
-    PreparedStatement s = null;
-    ResultSet userResultSet = null;
-    ResultSet sdtResultSet = null;
-    ResultSet dataResultSet = null;
-
-    try {
-      // Get the user and sdt associated with the data.
-      userResultSet = this.getUserRecord(this.connection, data.getOwner());
-      sdtResultSet = this.getSdtRecord(this.connection, data.getSensorDataType());
-
-      // Only store data if the sdt and user exists.
-      boolean hasSdt = sdtResultSet.next();
-      boolean hasUser = userResultSet.next();
-      if (hasSdt && hasUser) {
-        Object ownerId = userResultSet.getObject("Id");
-        Object sdtId = sdtResultSet.getObject("Id");
-
-        // Get the amount of records with the owner and timestamp.
-        dataResultSet = this
-            .getSensorDataRecord(this.connection, ownerId, data.getTimestamp());
-
-        // If the user with the same timestamp exists, perform an update.
-        if (dataResultSet.next()) {
-          s = this.connection.prepareStatement("UPDATE SensorData SET "
-              + " Sdt_Id=?, Runtime=?, Tool=?, Resource=?, XmlSensorData=?, "
-              + " XmlSensorDataRef=?, LastMod=?" + " WHERE Owner_Id=?" + andClause
-              + "Tstamp=?");
-          s.setObject(1, sdtId, Types.OTHER);
-          s.setTimestamp(2, Tstamp.makeTimestamp(data.getRuntime()));
-          s.setString(3, data.getTool());
-          s.setString(4, data.getResource());
-          s.setString(5, xmlSensorData);
-          s.setString(6, xmlSensorDataRef);
-          s.setTimestamp(7, new Timestamp(new Date().getTime()));
-          s.setObject(8, ownerId, Types.OTHER);
-          s.setTimestamp(9, Tstamp.makeTimestamp(data.getTimestamp()));
-          s.executeUpdate();
-          this.storeSensorDataProperties(dataResultSet.getObject("Id"), xmlSensorData, true);
-          this.logger.fine("Postgres: Updated " + data.getOwner() + " " + data.getTimestamp());
-        }
-        // Insert a new sensordata record.
-        else {
-          s = this.connection
-              .prepareStatement("INSERT INTO SensorData VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-          // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
-          // XmlSensorData XmlSensorDataRef
-          Object uuid = UUID.randomUUID();
-          s.setObject(1, uuid, Types.OTHER);
-          s.setObject(2, ownerId, Types.OTHER);
-          s.setTimestamp(3, Tstamp.makeTimestamp(data.getTimestamp()));
-          s.setObject(4, sdtId, Types.OTHER);
-          s.setTimestamp(5, Tstamp.makeTimestamp(data.getRuntime()));
-          s.setString(6, data.getTool());
-          s.setString(7, data.getResource());
-          s.setTimestamp(8, new Timestamp(new Date().getTime()));
-          s.setString(9, xmlSensorData);
-          s.setString(10, xmlSensorDataRef);
-          s.executeUpdate();
-          this.storeSensorDataProperties(uuid, xmlSensorData, false);
-          this.logger
-              .fine("Postgres: Inserted " + data.getOwner() + " " + data.getTimestamp());
-        }
-      }
-      else {
-        this.logger.fine("Postgres: Data not stored.  " + data.getSensorDataType()
-            + " SDT exists: " + hasSdt + ". " + data.getOwner() + " user exists: " + hasUser);
-      }
-    }
-    catch (SQLException e) {
-      this.logger.info(postgresError + StackTrace.toString(e));
-    }
-    finally {
-      try {
-        userResultSet.close();
-        sdtResultSet.close();
-        if (dataResultSet != null) {
-          dataResultSet.close();
-        }
-        if (s != null) {
-          s.close();
-        }
-      }
-      catch (SQLException e) {
-        this.logger.warning(errorClosingMsg + StackTrace.toString(e));
-      }
-    }
-    return true;
-  }
 
   /**
    * Stores the optional properties found in the specified sensor data string.
@@ -436,24 +345,6 @@ public class PostgresImplementation extends DbImplementation {
         + "(SELECT Id FROM Project WHERE ProjectName='" + projectName + "')";
     PreparedStatement statement = conn.prepareStatement(query,
         ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-    return statement.executeQuery();
-  }
-
-  /**
-   * The helper method used to return a SensorData ResultSet which has the
-   * specified owner and timestamp.
-   * @param conn the connection used to obtain the record.
-   * @param ownerId the record id of the user owning the returned SensorData.
-   * @param timestamp the timestamp of the sensor data.
-   * @return the result set containing the sensor data record.
-   * @throws SQLException thrown if the record could not be returned.
-   */
-  private ResultSet getSensorDataRecord(Connection conn, Object ownerId,
-      XMLGregorianCalendar timestamp) throws SQLException {
-    String query = "SELECT * FROM SensorData where" + ownerIdEquals + ownerId
-        + "' AND Tstamp='" + timestamp + "'";
-    PreparedStatement statement = conn.prepareStatement(query,
-        ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
     return statement.executeQuery();
   }
 

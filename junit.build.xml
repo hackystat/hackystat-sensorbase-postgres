@@ -33,10 +33,6 @@
       	<fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
-  	
-    <!-- Now delete the  unecessary .class files-->
-    <delete dir="${build.dir}/classes" />
-  	<antcall target="compile" />
   </target>
 
   <target name="junit.report" description="Generates an HTML report for JUnit.">

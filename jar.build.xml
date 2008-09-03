@@ -14,16 +14,19 @@
     description="Create sensorbase-postgres.jar">
   	<!-- Adds the sensorbase-postgres.jar to the sensorbase.jar's classpath -->
   	<mkdir dir="${tmp.sensorbase.dir}" />
+  	<!--
   	<unzip src="${basedir}/sensorbase.jar" dest="${tmp.sensorbase.dir}" />
+
   	<jar destfile="${basedir}/sensorbase.jar" basedir="${tmp.sensorbase.dir}">
   	  <manifest>
   	    <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
   	    <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
   	    <attribute name="Implementation-Version" value="${version}"/>
   	    <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
-        <attribute name="Class-Path" value="sensorbase-postgres.jar" /> 
+        <attribute name="Class-Path" value="sensorbase.jar" /> 
   	  </manifest>
     </jar>
+  	  	-->
   	
     <!-- Define the directories and distribution name -->
     <delete dir="${tmp.dir}" quiet="yes"/>
@@ -40,6 +43,7 @@
          <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
          <attribute name="Implementation-Version" value="${version}"/>
          <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
+       	 <attribute name="Class-Path" value="sensorbase.jar" /> 
        </manifest>
      </jar>
 
