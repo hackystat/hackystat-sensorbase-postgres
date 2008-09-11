@@ -1,7 +1,14 @@
 package org.hackystat.sensorbase.db.postgres;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -80,10 +87,12 @@ public class PostgresImplementation extends DbImplementation {
   public static final String POSTGRES_USER = "sensorbase.db.postgres.user";
   /** The postgres server password. */
   public static final String POSTGRES_PASSWORD = "sensorbase.db.postgres.password";
-  
-  /** The SQL state indicating that INSERT tried to add data to a table with a preexisting key. */
-  private static final String DUPLICATE_KEY = "23505";
 
+  /**
+   * The SQL state indicating that INSERT tried to add data to a table with a
+   * preexisting key.
+   */
+  private static final String DUPLICATE_KEY = "23505";
 
   /**
    * Instantiates the Postgres implementation. Throws a Runtime exception if the
@@ -93,16 +102,15 @@ public class PostgresImplementation extends DbImplementation {
   public PostgresImplementation(Server server) {
     super(server);
     ServerProperties props = new ServerProperties();
-    this.connectionURL = "jdbc:postgresql:" + props.get(POSTGRES_DB)
-        + "?user=" + props.get(POSTGRES_USER) + "&password="
-        + props.get(POSTGRES_PASSWORD);
-    // Try to load the derby driver. 
+    this.connectionURL = "jdbc:postgresql:" + props.get(POSTGRES_DB) + "?user="
+        + props.get(POSTGRES_USER) + "&password=" + props.get(POSTGRES_PASSWORD);
+    // Try to load the derby driver.
     try {
-      Class.forName("org.postgresql.Driver"); 
-    } 
+      Class.forName("org.postgresql.Driver");
+    }
     catch (java.lang.ClassNotFoundException e) {
       String msg = "Postgres: Exception during DbManager initialization: "
-        + "Postgres not on CLASSPATH.";
+          + "Postgres not on CLASSPATH.";
       this.logger.warning(msg + "\n" + StackTrace.toString(e));
       throw new RuntimeException(msg, e);
     }
@@ -118,93 +126,144 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void initialize() {
-    // No initialization is needed.
+    if (this.shouldLoadSchema()) {
+      try {
+        this.logger.warning("Postgres schema doesn't exist.  Creating...");
+        File topLevelDir = new File("");
+        File resource = new File(topLevelDir.getAbsolutePath() + "/"
+            + "postgres_hackystat_schema.sql");
+        URL url = resource.toURI().toURL();
+
+        BufferedReader reader = new BufferedReader(new FileReader(url.getFile()));
+        StringBuffer query = new StringBuffer();
+        String line = reader.readLine();
+        while (line != null) {
+          query.append(line);
+          line = reader.readLine();
+        }
+
+        PreparedStatement statement = this.connection.prepareStatement(query.toString());
+        statement.execute();
+        statement.close();
+        reader.close();
+      }
+      catch (SQLException e) {
+        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+      }
+      catch (MalformedURLException e) {
+        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+      }
+      catch (FileNotFoundException e) {
+        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+      }
+      catch (IOException e) {
+        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+      }
+    }
+  }
+
+  /**
+   * Returns true if the postgres schema file should be loaded.
+   * @return true if the schema should be loaded, false if not.
+   */
+  private boolean shouldLoadSchema() {
+    try {
+      PreparedStatement statement = this.connection
+          .prepareStatement("SELECT * FROM HackyUser");
+      statement.execute();
+      statement.close();
+    }
+    catch (SQLException e) {
+      return true;
+    }
+    return false;
   }
 
   /** {@inheritDoc} */
   @Override
-   public boolean storeSensorData(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
-     PreparedStatement preparedStatement = null;
-     try {
-       preparedStatement = this.connection.prepareStatement("INSERT INTO SensorData VALUES (?, "
-           + "(select id from hackyuser where email = ?), ?, "
-           + "(select id from sensordatatype where name = ?), ?, ?, ?, ?, ?, ?)");
-       // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
-       // XmlSensorData XmlSensorDataRef
-       Object uuid = UUID.randomUUID();
-       preparedStatement.setObject(1, uuid, Types.OTHER);
-       preparedStatement.setString(2, data.getOwner());
-       preparedStatement.setTimestamp(3, Tstamp.makeTimestamp(data.getTimestamp()));
-       preparedStatement.setString(4, data.getSensorDataType());
-       preparedStatement.setTimestamp(5, Tstamp.makeTimestamp(data.getRuntime()));
-       preparedStatement.setString(6, data.getTool());
-       preparedStatement.setString(7, data.getResource());
-       preparedStatement.setTimestamp(8, new Timestamp(new Date().getTime()));
-       preparedStatement.setString(9, xmlSensorData);
-       preparedStatement.setString(10, xmlSensorDataRef);
-       preparedStatement.executeUpdate();
-       this.storeSensorDataProperties(uuid, xmlSensorData, false);
-       this.logger.fine("Postgres: Inserted " + data.getOwner() + " " + data.getTimestamp());
-     }
-     catch (SQLException e) {
-       if (DUPLICATE_KEY.equals(e.getSQLState())) {
-         PreparedStatement sensordataIdStatement = null;
-         ResultSet sensordataIdResultSet = null;
-         try {
-           preparedStatement = this.connection.prepareStatement("UPDATE SensorData SET "
-               + " sdt_id=(select id from sensordatatype where name = ?), runtime=?, tool=?, " 
-               + " resource=?, xmlsensordata=?, xmlsensordataRef=?, lastmod=?"
-               + " WHERE owner_id=(select id from hackyuser where email = ?) AND tstamp=?");
-           // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
-           // XmlSensorData XmlSensorDataRef
-           preparedStatement.setString(1, data.getSensorDataType());
-           preparedStatement.setTimestamp(2, Tstamp.makeTimestamp(data.getRuntime()));
-           preparedStatement.setString(3, data.getTool());
-           preparedStatement.setString(4, data.getResource());
-           preparedStatement.setString(5, xmlSensorData);
-           preparedStatement.setString(6, xmlSensorDataRef);
-           preparedStatement.setTimestamp(7, new Timestamp(new Date().getTime()));
-           preparedStatement.setString(8, data.getOwner());
-           preparedStatement.setTimestamp(9, Tstamp.makeTimestamp(data.getTimestamp()));
-           preparedStatement.executeUpdate();
-           
-           String query = "SELECT sensordata.id FROM SensorData, hackyuser where email = '"  
-             + data.getOwner() + "' and sensordata.owner_id = hackyuser.id AND "
-             + " SensorData.Tstamp = '" + Tstamp.makeTimestamp(data.getTimestamp()) + "'";
-           sensordataIdStatement = this.connection.prepareStatement(query);
-           sensordataIdResultSet = sensordataIdStatement.executeQuery();
-           Object uuid = null;
-           if (sensordataIdResultSet.next()) {
-             uuid = sensordataIdResultSet.getObject(1);
-           }
-           
-           this.storeSensorDataProperties(uuid, xmlSensorData, true);
-         }
-         catch (SQLException f) {
-           this.logger.info(postgresError + StackTrace.toString(f));
-         }
-         finally {
-           try {
-             sensordataIdStatement.close();
-             sensordataIdResultSet.close();
-           }
-           catch (SQLException e2) {
-             this.logger.warning(errorClosingMsg + StackTrace.toString(e2));
-           }
-         }
-         this.logger.fine("Postgres: Updated " + data.getOwner() + " " + data.getTimestamp());
-       }
-     }
-     finally {
-       try {
-         preparedStatement.close();
-       }
-       catch (SQLException e) {
-         this.logger.warning(errorClosingMsg + StackTrace.toString(e));
-       }
-     }
-     return true;
-   }
+  public boolean storeSensorData(SensorData data, String xmlSensorData, String xmlSensorDataRef) {
+    PreparedStatement preparedStatement = null;
+    try {
+      preparedStatement = this.connection
+          .prepareStatement("INSERT INTO SensorData VALUES (?, "
+              + "(select id from hackyuser where email = ?), ?, "
+              + "(select id from sensordatatype where name = ?), ?, ?, ?, ?, ?, ?)");
+      // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
+      // XmlSensorData XmlSensorDataRef
+      Object uuid = UUID.randomUUID();
+      preparedStatement.setObject(1, uuid, Types.OTHER);
+      preparedStatement.setString(2, data.getOwner());
+      preparedStatement.setTimestamp(3, Tstamp.makeTimestamp(data.getTimestamp()));
+      preparedStatement.setString(4, data.getSensorDataType());
+      preparedStatement.setTimestamp(5, Tstamp.makeTimestamp(data.getRuntime()));
+      preparedStatement.setString(6, data.getTool());
+      preparedStatement.setString(7, data.getResource());
+      preparedStatement.setTimestamp(8, new Timestamp(new Date().getTime()));
+      preparedStatement.setString(9, xmlSensorData);
+      preparedStatement.setString(10, xmlSensorDataRef);
+      preparedStatement.executeUpdate();
+      this.storeSensorDataProperties(uuid, xmlSensorData, false);
+      this.logger.fine("Postgres: Inserted " + data.getOwner() + " " + data.getTimestamp());
+    }
+    catch (SQLException e) {
+      if (DUPLICATE_KEY.equals(e.getSQLState())) {
+        PreparedStatement sensordataIdStatement = null;
+        ResultSet sensordataIdResultSet = null;
+        try {
+          preparedStatement = this.connection.prepareStatement("UPDATE SensorData SET "
+              + " sdt_id=(select id from sensordatatype where name = ?), runtime=?, tool=?, "
+              + " resource=?, xmlsensordata=?, xmlsensordataRef=?, lastmod=?"
+              + " WHERE owner_id=(select id from hackyuser where email = ?) AND tstamp=?");
+          // Order: Id Owner_Id Tstamp Sdt_id Runtime Tool Resource LastMod
+          // XmlSensorData XmlSensorDataRef
+          preparedStatement.setString(1, data.getSensorDataType());
+          preparedStatement.setTimestamp(2, Tstamp.makeTimestamp(data.getRuntime()));
+          preparedStatement.setString(3, data.getTool());
+          preparedStatement.setString(4, data.getResource());
+          preparedStatement.setString(5, xmlSensorData);
+          preparedStatement.setString(6, xmlSensorDataRef);
+          preparedStatement.setTimestamp(7, new Timestamp(new Date().getTime()));
+          preparedStatement.setString(8, data.getOwner());
+          preparedStatement.setTimestamp(9, Tstamp.makeTimestamp(data.getTimestamp()));
+          preparedStatement.executeUpdate();
+
+          String query = "SELECT sensordata.id FROM SensorData, hackyuser where email = '"
+              + data.getOwner() + "' and sensordata.owner_id = hackyuser.id AND "
+              + " SensorData.Tstamp = '" + Tstamp.makeTimestamp(data.getTimestamp()) + "'";
+          sensordataIdStatement = this.connection.prepareStatement(query);
+          sensordataIdResultSet = sensordataIdStatement.executeQuery();
+          Object uuid = null;
+          if (sensordataIdResultSet.next()) {
+            uuid = sensordataIdResultSet.getObject(1);
+          }
+
+          this.storeSensorDataProperties(uuid, xmlSensorData, true);
+        }
+        catch (SQLException f) {
+          this.logger.info(postgresError + StackTrace.toString(f));
+        }
+        finally {
+          try {
+            sensordataIdStatement.close();
+            sensordataIdResultSet.close();
+          }
+          catch (SQLException e2) {
+            this.logger.warning(errorClosingMsg + StackTrace.toString(e2));
+          }
+        }
+        this.logger.fine("Postgres: Updated " + data.getOwner() + " " + data.getTimestamp());
+      }
+    }
+    finally {
+      try {
+        preparedStatement.close();
+      }
+      catch (SQLException e) {
+        this.logger.warning(errorClosingMsg + StackTrace.toString(e));
+      }
+    }
+    return true;
+  }
 
   /**
    * Stores the optional properties found in the specified sensor data string.
@@ -340,7 +399,7 @@ public class PostgresImplementation extends DbImplementation {
    * @throws SQLException thrown if the record could not be returned.
    */
   private ResultSet getProjectUriRecords(Connection conn, String projectName)
-      throws SQLException {
+    throws SQLException {
     String query = "SELECT * FROM ProjectUri where Project_Id IN "
         + "(SELECT Id FROM Project WHERE ProjectName='" + projectName + "')";
     PreparedStatement statement = conn.prepareStatement(query,
@@ -541,14 +600,14 @@ public class PostgresImplementation extends DbImplementation {
    * <p>
    * Each UriPattern is translated in the following way:
    * <ul>
-   * <li> If there is an occurrence of a "\" or a "/" in the UriPattern, then
-   * two translated UriPatterns are generated, one with all "\" replaced with
-   * "/", and one with all "/" replaced with "\".
-   * <li> The escape character is "\", unless we are generating a LIKE clause
+   * <li>If there is an occurrence of a "\" or a "/" in the UriPattern, then two
+   * translated UriPatterns are generated, one with all "\" replaced with "/",
+   * and one with all "/" replaced with "\".
+   * <li>The escape character is "\", unless we are generating a LIKE clause
    * containing a "\", in which case the escape character will be "/".
-   * <li> All occurrences of "%" in the UriPattern are escaped.
-   * <li> All occurrences of "_" in the UriPattern are escaped.
-   * <li> All occurrences of "*" are changed to "%".
+   * <li>All occurrences of "%" in the UriPattern are escaped.
+   * <li>All occurrences of "_" in the UriPattern are escaped.
+   * <li>All occurrences of "*" are changed to "%".
    * </ul>
    * The new set of 'translated' UriPatterns are now used to generate a set of
    * LIKE clauses with the following form:
@@ -788,11 +847,11 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void deleteSensorData(User user) {
-// no op for now. 
-//    if (true) {
-//      this.logger.fine("Postgres: Not Deleted" + user.getEmail());
-//      return;       
-//    }
+    // no op for now.
+    // if (true) {
+    // this.logger.fine("Postgres: Not Deleted" + user.getEmail());
+    // return;
+    // }
 
     ResultSet ownerResults = null;
     try {
@@ -1519,17 +1578,17 @@ public class PostgresImplementation extends DbImplementation {
     return true;
   }
 
-  /** 
-   * {@inheritDoc}. This is an estimate, it turns out that postgreSQL has some problems
-   * counting its row counts. 
+  /**
+   * {@inheritDoc}. This is an estimate, it turns out that postgreSQL has some
+   * problems counting its row counts.
    */
   @Override
   public int getRowCount(String table) {
     int numRows = -1;
     PreparedStatement s = null;
     ResultSet rs = null;
-    String statement = "select n_live_tup, relname, last_analyze from pg_stat_user_tables " 
-      + " where relname = '" + table.toLowerCase() + "'";
+    String statement = "select n_live_tup, relname, last_analyze from pg_stat_user_tables "
+        + " where relname = '" + table.toLowerCase() + "'";
     try {
       s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();
