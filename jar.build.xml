@@ -12,22 +12,9 @@
 
   <target name="jar-standalone" depends="compile" 
     description="Create sensorbase-postgres.jar">
-  	<!-- Adds the sensorbase-postgres.jar to the sensorbase.jar's classpath -->
-  	<mkdir dir="${tmp.sensorbase.dir}" />
-  	<!--
-  	<unzip src="${basedir}/sensorbase.jar" dest="${tmp.sensorbase.dir}" />
 
-  	<jar destfile="${basedir}/sensorbase.jar" basedir="${tmp.sensorbase.dir}">
-  	  <manifest>
-  	    <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
-  	    <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
-  	    <attribute name="Implementation-Version" value="${version}"/>
-  	    <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
-        <attribute name="Class-Path" value="sensorbase.jar" /> 
-  	  </manifest>
-    </jar>
-  	  	-->
-  	
+    <mkdir dir="${tmp.sensorbase.dir}" />
+
     <!-- Define the directories and distribution name -->
     <delete dir="${tmp.dir}" quiet="yes"/>
     <mkdir dir="${tmp.dir}" />
@@ -35,7 +22,7 @@
       <fileset dir="${basedir}/build/classes"/>
     </copy>
   	
-    <!-- Now add postgres and jar up sensorbase-postgres.jar. -->
+    <!-- Now add create a standalone sensorbase-postgres.jar. -->
     <unjar src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${tmp.dir}" />
     <unjar src="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" dest="${tmp.dir}"/>
     <jar destfile="${basedir}/sensorbase-postgres.jar" basedir="${tmp.dir}">
