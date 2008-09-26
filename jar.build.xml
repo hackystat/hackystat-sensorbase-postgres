@@ -36,14 +36,14 @@
     </copy>
   	
     <!-- Now add postgres and jar up sensorbase-postgres.jar. -->
+    <unjar src="${env.HACKYSTAT_SENSORBASE_HOME}/sensorbase.jar" dest="${tmp.dir}" />
     <unjar src="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" dest="${tmp.dir}"/>
     <jar destfile="${basedir}/sensorbase-postgres.jar" basedir="${tmp.dir}">
        <manifest>
          <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
-         <attribute name="Implementation-Title" value="Hackystat SensorBase-UH"/>
+         <attribute name="Implementation-Title" value="Hackystat SensorBase-UH (with Postgres)"/>
          <attribute name="Implementation-Version" value="${version}"/>
          <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
-       	 <attribute name="Class-Path" value="sensorbase.jar" /> 
        </manifest>
      </jar>
 

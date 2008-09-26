@@ -126,6 +126,7 @@ public class PostgresImplementation extends DbImplementation {
   /** {@inheritDoc} */
   @Override
   public void initialize() {
+    String errorPrefix = "Error loading database schema: ";
     if (this.shouldLoadSchema()) {
       try {
         this.logger.warning("Postgres schema doesn't exist.  Creating...");
@@ -148,16 +149,16 @@ public class PostgresImplementation extends DbImplementation {
         reader.close();
       }
       catch (SQLException e) {
-        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+        this.logger.warning(errorPrefix + StackTrace.toString(e));
       }
       catch (MalformedURLException e) {
-        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+        this.logger.warning(errorPrefix + StackTrace.toString(e));
       }
       catch (FileNotFoundException e) {
-        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+        this.logger.warning(errorPrefix + StackTrace.toString(e));
       }
       catch (IOException e) {
-        this.logger.warning("Error loading database schema: " + StackTrace.toString(e));
+        this.logger.warning(errorPrefix + StackTrace.toString(e));
       }
     }
   }

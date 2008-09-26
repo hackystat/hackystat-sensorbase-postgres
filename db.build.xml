@@ -12,8 +12,9 @@
   <!-- Starts the database. -->	
   <target name="db-start">
   	<echo message="Starting the database server..." />
+    <mkdir dir="${build.dir}/postgres"/>
     <exec executable="cmd" spawn="true">
-      <arg line="/c start pg_ctl start" />
+      <arg line="/c start pg_ctl start -l ${build.dir}/postgres/testlog.log" />
     </exec>
   </target>
 	
