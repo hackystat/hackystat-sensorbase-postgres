@@ -12,7 +12,6 @@
   </target>
 
   <target name="junit.tool" depends="compile" description="Run JUnit tests.">
-  	<antcall target="db-start" />
     <mkdir dir="${junit.dir}" />
   	
     <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
@@ -35,8 +34,6 @@
       	<fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
       </batchtest>
     </junit>
-  	
-  	<antcall target="db-stop" />
   </target>
 
   <target name="junit.report" description="Generates an HTML report for JUnit.">
