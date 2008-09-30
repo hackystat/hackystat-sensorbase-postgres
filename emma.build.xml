@@ -12,7 +12,6 @@
   <target name="emma" depends="clean, emma.tool, emma.report, emma.sensor, emma.echo" unless="emma.disabled" description="Runs Emma." />
 	
   <target name="emma.tool" depends="compile" unless="emma.disabled" description="Cleans, compiles, instruments byte codes, runs unit tests, generates Emma report.">
-  	<antcall target="db-start" />
     <!-- Verify that Emma is installed. -->
     <available file="${env.EMMA_HOME}/lib/emma.jar" property="emma.available" />
     <fail unless="emma.available" message="Error: EMMA_HOME not set or ${env.EMMA_HOME}/lib/emma.jar not found, indicating Emma is not installed." />
@@ -36,11 +35,12 @@
 
     <!-- Run JUnit with the instrumented class files. -->
     <mkdir dir="${junit.dir}" />
-    <junit printsummary="withOutAndErr" fork="yes">
+    <junit maxmemory="512M" printsummary="withOutAndErr" fork="yes">
       <sysproperty key="sensorbase.db.impl" value="org.hackystat.sensorbase.db.postgres.PostgresImplementation" />
       <sysproperty key="sensorbase.db.postgres.db" value="hackystat_test" />
       <sysproperty key="sensorbase.db.postgres.user" value="hackystat_test" />
-      <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" />    	    	
+      <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" />  
+      <sysproperty key="sensorbase.xml.dir" value="${env.HACKYSTAT_SENSORBASE_HOME}/xml" /> 
       <classpath>
         <path refid="emma.lib.dir" />
         <path refid="compile.classpath" />
@@ -73,7 +73,6 @@
     <delete dir="${build.dir}/classes" />
   	<ant antfile="jar.build.xml"/> 
   	
-  	<antcall target="db-stop" />
   </target>
 
   <target name="emma.report" unless="emma.disabled" description="Generates XML and HTML reports.">
