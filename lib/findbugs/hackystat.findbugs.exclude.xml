@@ -14,5 +14,8 @@
     <Package name="~.*\.jaxb" />
     <Bug pattern="SE_BAD_FIELD" />
   </Match>
+  <Match>
+    <Bug pattern="OBL_UNSATISFIED_OBLIGATION" />
+  </Match>
 </FindBugsFilter>
 

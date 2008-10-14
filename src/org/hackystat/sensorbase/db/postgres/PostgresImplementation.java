@@ -619,7 +619,7 @@ public class PostgresImplementation extends DbImplementation {
    * </pre>
    * 
    * <p>
-   * There is one special case. If the List<UriPattern> is null, empty, or
+   * There is one special case. If the List(UriPattern) is null, empty, or
    * consists of exactly one UriPattern which is "**" or "*", then the empty
    * string is returned. This is an optimization for the common case where all
    * resources should be matched and so we don't need any LIKE clauses.
