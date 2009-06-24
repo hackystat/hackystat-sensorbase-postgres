@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -805,7 +806,9 @@ public class PostgresImplementation extends DbImplementation {
     }
     finally {
       try {
-        s.close();
+        if (s != null) {
+          s.close();
+        }
         ownerResults.close();
         if (rs != null) {
           rs.close();
@@ -1589,7 +1592,7 @@ public class PostgresImplementation extends DbImplementation {
     PreparedStatement s = null;
     ResultSet rs = null;
     String statement = "select n_live_tup, relname, last_analyze from pg_stat_user_tables "
-        + " where relname = '" + table.toLowerCase() + "'";
+        + " where relname = '" + table.toLowerCase(Locale.ENGLISH) + "'";
     try {
       s = this.connection.prepareStatement(statement);
       rs = s.executeQuery();

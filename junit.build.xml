@@ -1,54 +1,65 @@
-<project name="junit" default="junit">
+<project name="stack.junit" default="junit" xmlns:ivy="antlib:org.apache.ivy.ant">
   <description>
-  Provides the JUnit tool and the Hackystat JUnit sensor.
+    Runs junit on system, using tests in classes whose names start with Test*.
+    Invocation: ant -f junit.build.xml
   </description>
 
-  <import file="build.xml" />
-  <import file="db.build.xml" />
-  <property name="junit.dir" location="${build.dir}/junit" />
-  
-  <target name="junit" depends="junit.tool, junit.report, junit.sensor" description="Runs JUnit, JunitReport">
-    <fail if="junit.failed">JUnit test case(s) failed.</fail>
-  </target>
+  <import file="build.xml"/>
+  <property name="junit.build.dir" location="${build.dir}/junit" />
+  <property name="junit.haltonfailure" value="false"/>
+
+  <target name="junit" depends="junit.tool, junit.report, junit.sensor" description="Runs JUnit, JunitReport"/>
 
   <target name="junit.tool" depends="compile" description="Run JUnit tests.">
-    <mkdir dir="${junit.dir}" />
-  	
+    <mkdir dir="${junit.build.dir}" />
+    <property name="sensorbase.xml.dir" location="../hackystat-sensorbase-uh/xml"/>
+    
     <!-- Run the tests, which are all classes whose name starts with 'Test'. -->
-    <!-- Fork is on until I can figure out how to stop the sensorbase and unbind the port. -->
-    <!-- Note that emma is forking in its JUnit as well. -->
-    <junit maxmemory="512M" printsummary="withOutAndErr" haltonfailure="${junit.haltonfailure}" fork="yes" failureproperty="junit.failed">
-      <sysproperty key="sensorbase.db.impl" value="org.hackystat.sensorbase.db.postgres.PostgresImplementation" />
-      <sysproperty key="sensorbase.db.postgres.db" value="hackystat_test" />
-      <sysproperty key="sensorbase.db.postgres.user" value="hackystat_test" />
-      <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" /> 
-      <sysproperty key="sensorbase.xml.dir" value="${env.HACKYSTAT_SENSORBASE_HOME}/xml" /> 
-      <classpath>
-        <pathelement location="${build.dir}/classes" />
-        <path refid="compile.classpath" />
-      </classpath>
-      <sysproperty key="user.dir" value="${basedir}" />
-      <formatter type="xml" />
-      <batchtest todir="${junit.dir}">
-        <fileset dir="${src.dir}" includes="**/Test*.java" />
-      	<fileset dir="${env.HACKYSTAT_SENSORBASE_HOME}\src" includes="**/Test*.java" />
-      	<fileset dir="${build.dir}/classes" includes="org/hackystat/**/Test*.class" />
-      </batchtest>
-    </junit>
+    <junit maxmemory="512M" printsummary="withOutAndErr" fork="yes">
+       <classpath path="${build.dir}/classes">
+         <path refid="compile.classpath" />
+       </classpath>
+       <sysproperty key="user.dir" value="${basedir}" />
+       <sysproperty key="sensorbase.db.impl" value="org.hackystat.sensorbase.db.postgres.PostgresImplementation" />
+       <sysproperty key="sensorbase.db.postgres.db" value="hackystat_test" />
+       <sysproperty key="sensorbase.db.postgres.user" value="hackystat_test" />
+       <sysproperty key="sensorbase.db.postgres.password" value="hackystat_test" />  
+       <sysproperty key="sensorbase.xml.dir" value="${sensorbase.xml.dir}" /> 
+      
+       <formatter type="xml" />
+       <batchtest todir="${junit.build.dir}">
+         <fileset dir="${src.dir}">
+           <include name="**/Test*.java" />
+         </fileset>
+         <zipfileset src="${lib.dir}/hackystat-sensorbase-uh/sensorbase.jar">
+           <include name="**/org/hackystat/sensorbase/**/Test*.class"/>
+         </zipfileset>        
+       </batchtest>
+     </junit>
   </target>
 
   <target name="junit.report" description="Generates an HTML report for JUnit.">
-    <taskdef name="junitreport" classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator" />
-    <junitreport todir="${junit.dir}">
-      <fileset dir="${junit.dir}" includes="TEST-*.xml" />
-      <report format="frames" todir="${junit.dir}" />
+    <taskdef name="junitreport" 
+      classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator" />
+    <junitreport todir="${junit.build.dir}">
+      <fileset dir="${junit.build.dir}" includes="TEST-*.xml"/>
+      <report format="frames" todir="${junit.build.dir}" />
     </junitreport>
   </target>
+  
+  <target name="junit.sensor" description="Sends UnitTest data to Hackystat using the JUnit sensor.">
+    <ivy:retrieve module="hackystat" organisation="org.hackystat" revision="${hackystat.version}" pattern="${lib.dir}/hackystat/[artifact].[ext]" sync="true" inline="true" log="download-only" conf="ant" transitive="false" type="jar"/>
+    <taskdef resource="antlib.xml" classpath="${lib.dir}/hackystat/antsensors.jar" />
 
-  <target name="junit.sensor" description="Send hackystat data about this JUnit invocation." if="hackystat.enabled">
-    <fileset id="junit.datafiles" dir="${junit.dir}" includes="TEST-*.xml" />
-    <fileset id="junit.sourcefiles" dir="${src.dir}" includes="**/Test*.java" />
-    <hackystat.junit junit.sourcefiles.fileset="junit.sourcefiles" junit.datafiles.fileset="junit.datafiles" verbose="${hackystat.verbose.mode}" />
+    <!-- Send JUnit test data to Hackystat using the JUnit sensor. -->
+    <hacky-junit verbose="${hackystat.verbose.mode}" failOnError="true">
+      <sourcefiles>
+        <fileset dir="${src.dir}" includes="**/*.java"/>
+      </sourcefiles>
+      <datafiles>
+        <fileset dir="${junit.build.dir}" includes="TEST-*.xml" />
+      </datafiles>
+    </hacky-junit>
   </target>
 </project>
 

@@ -1,0 +1,859 @@
+Microsoft Windows XP [Version 5.1.2600]
+(C) Copyright 1985-2001 Microsoft Corp.
+
+c:\hackystat-projects>cd hackystat-sensorbase-postgres
+
+C:\hackystat-projects\hackystat-sensorbase-postgres>pg_ctl start
+server starting
+
+C:\hackystat-projects\hackystat-sensorbase-postgres>LOG:  database system was interrupted; last known up at 2009-06-24 09:18:30 HST
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  record with zero length at 0/ABAF30
+LOG:  redo is not required
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+
+C:\hackystat-projects\hackystat-sensorbase-postgres>ant -f junit.build.xml
+Buildfile: junit.build.xml
+
+compile-sensorbase-uh:
+
+compile:
+
+junit.tool:
+    [junit] Running org.hackystat.sensorbase.db.derby.TestConstructLikeClauses
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.094 sec
+    [junit] Running org.hackystat.sensorbase.mailer.TestMailer
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.625 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:22  Starting sensorbase.
+    [junit] 06/24 09:23:22  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:22  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:23  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:23  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:23  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:23  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:23  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:23  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:23  SensorBase (Version 8.x.624) now running.
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.db.TestCompressRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.89 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:24  Starting sensorbase.
+    [junit] 06/24 09:23:24  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:24  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:25  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:25  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:25  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:26  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:26  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:26  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:26  SensorBase (Version 8.x.624) now running.
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.db.TestIndexRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 2.016 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:27  Starting sensorbase.
+    [junit] 06/24 09:23:27  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:27  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:28  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:28  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:28  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:28  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:29  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:29  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:29  SensorBase (Version 8.x.624) now running.
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.db.TestRowCountRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.891 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:30  Starting sensorbase.
+    [junit] 06/24 09:23:30  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:30  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:30  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:31  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:31  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:31  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:31  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:31  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:31  SensorBase (Version 8.x.624) now running.
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.ping.TestPingRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 2.093 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:33  Starting sensorbase.
+    [junit] 06/24 09:23:33  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:33  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:33  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:33  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:33  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:34  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:34  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:34  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:34  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:34  Registered: TestPing@hackystat.org TestPing@hackystat.org
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.projects.TestProjectMembershipRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+WARNING:  nonstandard use of \\ in a string literal at character 356
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 356
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 3 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:35  Starting sensorbase.
+    [junit] 06/24 09:23:35  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:35  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:36  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:36  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:36  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:37  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:37  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:37  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:37  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:37  Registered: TestProjectMembershipUser1@hackystat.org TestProjectMembershipUser1@hackystat.org
+    [junit] 06/24 09:23:37  Registered: TestProjectMembershipUser2@hackystat.org TestProjectMembershipUser2@hackystat.org
+    [junit] 06/24 09:23:38  Put: 2009-06-24T09:23:38.608-10:00 TestProjectMembershipUser1@hackystat.org Subversion TestSdt file://foo/bar/test/baz.txt
+    [junit] 06/24 09:23:38  Put: 2009-06-24T09:23:38.639-10:00 TestProjectMembershipUser2@hackystat.org Subversion TestSdt file://foo/bar/test/baz.txt
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.projects.TestProjectRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 368
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 533
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 368
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 533
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 368
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 533
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 368
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 533
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 424
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 589
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 448
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 613
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 441
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 606
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 372
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 537
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+LOG:  unexpected EOF on client connection
+    [junit] Tests run: 14, Failures: 0, Errors: 0, Time elapsed: 3.922 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:39  Starting sensorbase.
+    [junit] 06/24 09:23:39  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:39  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:40  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:40  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:40  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:40  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:41  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:41  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:41  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:41  Registered: TestProjectSnapshot@hackystat.org TestProjectSnapshot@hackystat.org
+    [junit] 06/24 09:23:42  Put: 2007-04-30T09:01:00.000-10:00 TestProjectSnapshot@hackystat.org Tool1 TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:42  Put: 2007-04-30T09:02:00.000-10:00 TestProjectSnapshot@hackystat.org Tool1 TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:42  Put: 2007-04-30T09:03:00.000-10:00 TestProjectSnapshot@hackystat.org Tool2 TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:43  Registered: NewUserTest@hackystat.org NewUserTest@hackystat.org
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.projects.TestProjectSpectatorRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+WARNING:  nonstandard use of \\ in a string literal at character 305
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 2.281 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:44  Starting sensorbase.
+    [junit] 06/24 09:23:44  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:44  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:44  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:45  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:45  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:45  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:45  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:45  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:45  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:46  Registered: TestProjectSpectatorUser1@hackystat.org TestProjectSpectatorUser1@hackystat.org
+    [junit] 06/24 09:23:46  Registered: TestProjectSpectatorUser2@hackystat.org TestProjectSpectatorUser2@hackystat.org
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.projects.TestProjectUriPatterns
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+WARNING:  nonstandard use of \\ in a string literal at character 317
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 317
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 266
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of escape in a string literal at character 318
+HINT:  Use the escape string syntax for escapes, e.g., E'\r\n'.
+WARNING:  nonstandard use of \\ in a string literal at character 319
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+WARNING:  nonstandard use of \\ in a string literal at character 472
+HINT:  Use the escape string syntax for backslashes, e.g., E'\\'.
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 3.515 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:47  Starting sensorbase.
+    [junit] 06/24 09:23:47  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:47  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:47  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:48  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:48  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:48  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:48  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:48  Table counts: SensorDataType:0 Project:0 SensorData:0 HackyUser:0
+    [junit] 06/24 09:23:48  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:49  Registered: TestProjectUriPatterns@hackystat.org TestProjectUriPatterns@hackystat.org
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.591-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://foo/bar/baz.java
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.623-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://foo\bar\baz.java
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.732-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://foo/bar/baz.java
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.810-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://foo/bar/baz.java
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.873-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://\foo\bar\baz.java
+    [junit] 06/24 09:23:49  Put: 2009-06-24T09:23:49.904-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://qux/bar/baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:49.998-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt \foo\bar\baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.076-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt /foo/bar/baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.091-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt \qux\bar\baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.201-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt \foo\bar\baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.216-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt /foo/bar/baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.279-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt foo/bar/baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.295-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt \qux\bar\baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.420-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt foo.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.482-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt bar.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.498-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt baz.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.576-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt qux.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.638-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file:///foo.java
+    [junit] 06/24 09:23:50  Put: 2009-06-24T09:23:50.670-10:00 TestProjectUriPatterns@hackystat.org Subversion TestSdt file://\foo.java
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.projects.jaxb.TestJAXBExtensions
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.125 sec
+    [junit] Running org.hackystat.sensorbase.resource.sensordata.TestSensorDataRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 7.093 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] No cache: 812, with cache: 94
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:23:52  Starting sensorbase.
+    [junit] 06/24 09:23:52  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:23:52  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:23:52  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:23:52  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:23:53  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:23:53  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:23:53  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:23:53  Table counts: SensorDataType:0 Project:0 SensorData:16 HackyUser:0
+    [junit] 06/24 09:23:53  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:23:53  Registered: TestDeleteUser@hackystat.org TestDeleteUser@hackystat.org
+    [junit] 06/24 09:23:53  Put: 2009-06-24T09:23:53.841-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:53  Put: 2009-06-24T09:23:53.888-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:53  Put: 2009-06-24T09:23:53.951-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:53.982-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.044-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.076-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.138-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.169-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.247-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.263-10:00 TestDeleteUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Registered: TestCacheUser@hackystat.org TestCacheUser@hackystat.org
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.591-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.654-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.669-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.747-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.763-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.794-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.857-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.888-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:54  Put: 2009-06-24T09:23:54.935-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:54.966-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.044-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.060-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.091-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.154-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.185-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.247-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.279-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.294-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.357-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.372-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.435-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.466-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.482-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.560-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.575-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.607-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.638-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.669-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.685-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.747-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.779-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.794-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.857-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.872-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.904-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.935-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:55  Put: 2009-06-24T09:23:55.966-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:55.997-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.060-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.075-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.138-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.169-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.185-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.247-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.278-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.294-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.341-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.372-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.388-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:56  Put: 2009-06-24T09:23:56.450-10:00 TestCacheUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:58  Put: 2009-06-24T09:23:58.638-10:00 TestUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:58  Put: 2009-06-24T09:23:58.669-10:00 TestUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:58  Put: 2007-04-30T02:00:00.000-10:00 TestUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:59  Put: 2007-04-30T02:00:00.123-10:00 TestUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit] 06/24 09:23:59  Put: 2007-04-30T02:00:00.124-10:00 TestUser@hackystat.org Subversion TestSdt file://foo/bar/baz.txt
+    [junit]
+    [junit] Shutting down TestCaching cache.
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.sensordata.jaxb.TestJAXBExtensions
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.094 sec
+    [junit] Running org.hackystat.sensorbase.resource.sensordatatypes.TestSdtRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 2.078 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:24:00  Starting sensorbase.
+    [junit] 06/24 09:24:00  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:24:00  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:24:00  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:24:01  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:24:01  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:24:01  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:24:01  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:24:01  Table counts: SensorDataType:0 Project:0 SensorData:16 HackyUser:0
+    [junit] 06/24 09:24:01  SensorBase (Version 8.x.624) now running.
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.users.TestPasswordGenerator
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.078 sec
+    [junit] Running org.hackystat.sensorbase.resource.users.TestUsersRestApi
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+ERROR:  duplicate key value violates unique constraint "sensordata_owner_id_key"
+STATEMENT:  INSERT INTO SensorData VALUES ($1, (select id from hackyuser where email = $2), $3, (select id from sensordatatype where name = $4), $5, $6, $7, $8, $9, $10)
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 4.703 sec
+    [junit] Output:
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit] C:\Documents and Settings\johnson/.hackystat/sensorbase/sensorbase.properties not found. Using default sensorbase properties.
+    [junit]
+    [junit] Error:
+    [junit] 06/24 09:24:03  Starting sensorbase.
+    [junit] 06/24 09:24:03  Host: http://localhost:9976/sensorbase/
+    [junit] 06/24 09:24:03  SensorBase Properties:
+    [junit]                 sensorbase.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.context.root = sensorbase
+    [junit]                 sensorbase.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.db.impl = org.hackystat.sensorbase.db.postgres.PostgresImplementation
+    [junit]                 sensorbase.db.postgres.db = hackystat_test
+    [junit]                 sensorbase.db.postgres.password = hackystat_test
+    [junit]                 sensorbase.db.postgres.user = hackystat_test
+    [junit]                 sensorbase.db.startup.compress = false
+    [junit]                 sensorbase.db.startup.reindex = false
+    [junit]                 sensorbase.hostname = localhost
+    [junit]                 sensorbase.logging.level = INFO
+    [junit]                 sensorbase.port = 9976
+    [junit]                 sensorbase.restlet.logging = false
+    [junit]                 sensorbase.smtp.host = mail.hawaii.edu
+    [junit]                 sensorbase.test.admin.email = admin@hackystat.org
+    [junit]                 sensorbase.test.admin.password = admin@hackystat.org
+    [junit]                 sensorbase.test.db.dir = C:\Documents and Settings\johnson/.hackystat/sensorbase/testdb
+    [junit]                 sensorbase.test.domain = hackystat.org
+    [junit]                 sensorbase.test.hostname = localhost
+    [junit]                 sensorbase.test.install = true
+    [junit]                 sensorbase.test.port = 9976
+    [junit]                 sensorbase.xml.dir = c:\hackystat-projects\hackystat-sensorbase-uh/xml
+    [junit]
+    [junit] 06/24 09:24:04  Loading SDT defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordatatypes.defaults.xml
+    [junit] 06/24 09:24:04  Loading User defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\users.defaults.xml
+    [junit] 06/24 09:24:04  Loading Project defaults from c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\projects.defaults.xml
+    [junit] 06/24 09:24:04  Loading SensorData defaults: c:\hackystat-projects\hackystat-sensorbase-uh\xml\defaults\sensordata.defaults.xml
+    [junit] 06/24 09:24:05  Maximum Java heap size (MB): 532.742144
+    [junit] 06/24 09:24:05  Table counts: SensorDataType:0 Project:0 SensorData:16 HackyUser:0
+    [junit] 06/24 09:24:05  SensorBase (Version 8.x.624) now running.
+    [junit] 06/24 09:24:07  Registered: TestPost@hackystat.org TestPost@hackystat.org
+    [junit] 06/24 09:24:07  Registered: TestPost@hackystat.org TestPost@hackystat.org
+    [junit] 06/24 09:24:08  Registered: TestPost@hackystat.org TestPost@hackystat.org
+    [junit]
+LOG:  could not receive data from client: No connection could be made because the target machine actively refused it.
+
+LOG:  unexpected EOF on client connection
+    [junit] Running org.hackystat.sensorbase.resource.users.jaxb.TestJAXBExtensions
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.078 sec
+    [junit] Running org.hackystat.sensorbase.uripattern.TestPatternMatcher
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.093 sec
+    [junit] Running org.hackystat.sensorbase.uripattern.TestUriPattern
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.11 sec
+
+junit.report:
+[junitreport] Processing C:\hackystat-projects\hackystat-sensorbase-postgres\build\junit\TESTS-TestSuites.xml to C:\DOCUME~1\johnson\LOCALS~1\Temp\null1789499345
+[junitreport] Loading stylesheet jar:file:/C:/java-tools/apache-ant-1.7.1/lib/ant-junit.jar!/org/apache/tools/ant/taskdefs/optional/junit/xsl/junit-frames.xsl
+[junitreport] Transform time: 781ms
+[junitreport] Deleting: C:\DOCUME~1\johnson\LOCALS~1\Temp\null1789499345
+
+junit.sensor:
+[hacky-junit] 58 UnitTest sensor data instances created.
+[hacky-junit] These instances were transmitted to: http://dasha.ics.hawaii.edu:9876/sensorbase/ (1 secs.)
+
+junit:
+
+BUILD SUCCESSFUL
+Total time: 52 seconds
+Sending build result to Hackystat server...
+C:\hackystat-projects\hackystat-sensorbase-postgres>
