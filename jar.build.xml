@@ -3,42 +3,46 @@
   Provides the target for building a jar file of the SensorBase with Postgres.
   </description>
 
-  <import file="build.xml"/>
+  <import file="build.xml" />
   <property name="tmp.dir" location="${basedir}/tmp" />
   <property name="tmp.lib.dir" location="${basedir}/tmp-lib" />
   <property name="build.jar.dir" location="${build.dir}/jar" />
 
-  <target name="jar" depends="compile" 
-    description="Create sensorbase-postgres.jar">
+  <target name="jar" depends="compile" description="Create sensorbase-postgres.jar">
 
     <!-- Define the directories and distribution name -->
-    <delete dir="${tmp.dir}" quiet="yes"/>
+    <delete dir="${tmp.dir}" quiet="yes" />
     <mkdir dir="${tmp.dir}" />
     <mkdir dir="${build.jar.dir}" />
     <copy todir="${tmp.dir}">
-      <fileset dir="${build.dir}/classes"/>
+      <fileset dir="${build.dir}/classes" />
     </copy>
-  	
+
     <!-- Now add create a standalone sensorbase-postgres.jar. -->
     <unjar src="${lib.dir}/hackystat-sensorbase-uh/sensorbase.jar" dest="${tmp.dir}" />
-    <unjar src="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" dest="${tmp.dir}"/>
+    <unjar src="${env.POSTGRES_DRIVER_HOME}/postgresql-8.3-603.jdbc4.jar" dest="${tmp.dir}" />
     <jar destfile="${build.jar.dir}/sensorbase-postgres.jar" basedir="${tmp.dir}">
-       <manifest>
-         <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server"/>
-         <attribute name="Implementation-Title" value="Hackystat SensorBase-UH (with Postgres)"/>
-         <attribute name="Implementation-Version" value="${version}"/>
-         <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii"/>
-       </manifest>
-     </jar>
+      <manifest>
+        <attribute name="Main-Class" value="org.hackystat.sensorbase.server.Server" />
+        <attribute name="Implementation-Title" value="Hackystat SensorBase-UH (with Postgres)" />
+        <attribute name="Implementation-Version" value="${version}" />
+        <attribute name="Implementation-Vendor" value="Collaborative Software Development Laboratory, University of Hawaii" />
+      </manifest>
+    </jar>
     <delete dir="${tmp.dir}" />
-  </target> 
-  
+  </target>
+
   <target name="publish" depends="jar" description="Publish this project in the local ivy repository">
     <ivy:resolve />
     <tstamp>
       <format property="publication-revision" pattern="yyyy.MM.dd.hh.mm.ss" />
     </tstamp>
-    <ivy:publish artifactspattern="${build.jar.dir}/[artifact].[ext]" resolver="local-repository" pubrevision="${publication-revision}" update="true"/>
-  </target>   
+    <ivy:publish artifactspattern="${build.jar.dir}/[artifact].[ext]" resolver="local-repository" pubrevision="${publication-revision}" update="true" />
+  </target>
+
+  <target name="publish-all" description="Publish all dependent projects, then this one.">
+    <ant antfile="../hackystat-sensorbase-uh/jar.build.xml" target="publish-all" inheritAll="false" />
+    <antcall target="publish" />
+  </target>
 </project>
 
