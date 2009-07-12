@@ -23,7 +23,6 @@
   <!-- Basic properties for this system. -->
   <property name="system.name" value="hackystat-sensorbase-postgres" />
 
-
   <!-- The compile classpath is useful to many tools. -->
   <path id="compile.classpath">
     <path refid="hackystat-sensorbase-uh.path" />
